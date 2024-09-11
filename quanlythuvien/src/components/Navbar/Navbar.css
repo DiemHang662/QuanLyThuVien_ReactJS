@@ -1,0 +1,82 @@
+
+.nav-link {
+    color:white !important;
+    display: flex;
+    align-items: center;
+    margin: 0 20px !important ;
+    font-weight: bold !important;
+    text-transform: uppercase;
+  }
+  
+  .nav-link:hover,
+  .nav-link:focus,
+  .nav-link:active {
+    color:red !important;
+    background-color:whitesmoke;
+    opacity: 0.8;
+  }
+  
+  .navbar-toggler {
+    border-color:#007bff;
+  }
+  
+  .btn-login {
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    margin-top: 5px !important;
+    height:40px !important;
+  }
+  
+  .btn-login:hover {
+    color: #007bff;
+  }
+  
+  .img-avatar {
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    color: black !important;
+  }
+  
+  .searchInput {
+    display: flex;
+    width: 25% !important;
+    height: 35px;
+  }
+  
+  .form-control {
+    border-radius: 20px 0 0 20px;
+    border: 1px solid #ced4da;
+    margin-right: 0;
+  }
+  
+  .bt-search {
+    border: none;
+    color: white !important;
+    margin-left: -5px;
+    margin-top: 5px !important;
+  }
+  
+  .bt-search:hover {
+    color: black;
+  }
+  
+  .login{
+    font-size: 20px !important;
+  }
+  
+  .dropdown-item{
+    text-align: center !important;
+  }
+  
+  .dropdown-item:hover{
+    color:dodgerblue !important;
+    background-color: whitesmoke !important;
+  }
