@@ -1,18 +1,13 @@
 import React, { useContext } from 'react';
-import { Navbar, Container, Nav, NavDropdown, Form, FormControl, Button } from 'react-bootstrap';
+import { Navbar, Container, Nav, Button, Form, FormControl } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
-import HomeIcon from '@mui/icons-material/Home';
-import ReceiptIcon from '@mui/icons-material/Receipt';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import ChatIcon from '@mui/icons-material/Chat';
 import './Navbar.css';
-import { MyUserContext, MyDispatchContext } from '../../configs/Contexts';
+import { MyUserContext } from '../../configs/Contexts';
 
 const NavbarComponent = ({ searchTerm, setSearchTerm }) => {
   const user = useContext(MyUserContext);
-  const dispatch = useContext(MyDispatchContext);
 
   const handleSearch = () => {
     console.log('Searching for:', searchTerm);
@@ -22,53 +17,45 @@ const NavbarComponent = ({ searchTerm, setSearchTerm }) => {
     setSearchTerm(e.target.value);
   };
 
-  const handleLogout = () => {
-    dispatch({ type: 'logout' });
-  };
-
   return (
-    <Navbar className="navbar-custom navbar-expand-lg bg-primary">
+    <Navbar className="navbar-custom bg-white shadow-sm" expand="lg">
       <Container fluid>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">
-            <Nav.Link as={Link} to="/"><HomeIcon /> Trang chủ</Nav.Link>
-            {user && user.is_superuser && (
-                 <Nav.Link as ={Link} to ="/resident">Cư dân</Nav.Link>
-              )}
-            <Nav.Link as={Link} to="/bill"><ReceiptIcon /> Hóa đơn</Nav.Link>
-            <Nav.Link as={Link} to="/product"><ShoppingCartIcon /> Mua hàng</Nav.Link>
-            <Nav.Link as={Link} to="/chat"><ChatIcon /> Trò chuyện</Nav.Link> 
-            <NavDropdown title="Khác" id="basic-nav-dropdown" align="end">
-              <NavDropdown.Item as={Link} to="/survey">Khảo sát</NavDropdown.Item>
-              <NavDropdown.Item as={Link} to="/payment">Thanh toán</NavDropdown.Item>
-              {user && user.is_superuser && (
-                <>
-                  <NavDropdown.Item as={Link} to="/register">Cấp tài khoản</NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/statistics">Thống kê báo cáo</NavDropdown.Item>
-                </>
-              )}
-              <NavDropdown.Divider />
-              <NavDropdown.Item as={Link} to="/" onClick={handleLogout}>Đăng xuất</NavDropdown.Item>
-            </NavDropdown>
+        <Navbar.Brand as={Link} to="/" className="text-dark">
+          Acme Inc
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="navbarScroll" />
+        <Navbar.Collapse id="navbarScroll">
+          <Nav className="me-auto my-2 my-lg-0">
+            <Nav.Link as={Link} to="/" className="text-dark">
+              Home
+            </Nav.Link>
+            <Nav.Link as={Link} to="/about" className="text-dark">
+              About
+            </Nav.Link>
+            <Nav.Link as={Link} to="/contact" className="text-dark">
+              Contact
+            </Nav.Link>
           </Nav>
-          <Form className="searchInput" role="search">
+          <Form className="d-flex">
             <FormControl
               type="search"
-              placeholder="Search..."
+              placeholder="Search"
+              className="me-2"
+              aria-label="Search"
               value={searchTerm}
               onChange={handleChange}
-              aria-label="Search"
             />
-            <Button className="bt-search" variant="primary" onClick={handleSearch}>
+            <Button variant="outline-dark" onClick={handleSearch}>
               <SearchIcon />
             </Button>
           </Form>
           {!user ? (
-            <Button as={Link} to="/login" className="btn-login" variant="primary"><AccountCircleIcon /></Button>
+            <Button as={Link} to="/login" className="btn-login ms-3" variant="outline-light">
+              <AccountCircleIcon />
+            </Button>
           ) : (
-            <Nav.Link as={Link} to="/profile" className="user-info">
-              <img src={user.avatar_url} alt="Avatar" className="img-avatar" />
+            <Nav.Link as={Link} to="/profile" className="d-flex align-items-center ms-3">
+              <img src={user.avatar_url} alt="Avatar" className="img-avatar rounded-circle" />
             </Nav.Link>
           )}
         </Navbar.Collapse>

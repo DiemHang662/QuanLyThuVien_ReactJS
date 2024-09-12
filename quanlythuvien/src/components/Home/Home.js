@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
-import { Carousel, Container } from 'react-bootstrap';
+import { Carousel } from 'react-bootstrap';
 import Navbar from '../../components/Navbar/Navbar'; 
 import Footer from '../../components/Footer/Footer'; 
 import "./Home.css";
+import MainLayout from '../Navbar/MainLayout';
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const images = [
-    'https://xaydungnhatrongoi.vn/wp-content/uploads/2023/09/1-9.jpg',
-    'https://sbshouse.vn/wp-content/uploads/2023/10/phong-khach-chung-cu-hien-dai.jpg',
-    'https://toquoc.mediacdn.vn/280518851207290880/2022/10/10/image001-16653869111531095951154.jpg',
+    'https://vbs.edu.vn/wp-content/uploads/2023/05/Brown-and-Blue-Photo-Library-Birthday-Virtual-Background.png',
+    'https://file.hstatic.net/200000090679/file/z5679281412660_7636cf5aa93594064a10a52aa07b23cf.jpg',
+    'https://tiki.vn/blog/wp-content/uploads/2023/08/thumb-12.jpg',
   ];
 
   return (
     <>
-      < div className="container-home">
+      <div className="container-home">
         <Carousel>
           {images.map((image, index) => (
             <Carousel.Item key={index}>
@@ -24,15 +25,12 @@ const Home = () => {
                 src={image}
                 alt={`slide-${index}`}
               />
-              <Carousel.Caption>
-  
-              </Carousel.Caption>
             </Carousel.Item>
           ))}
         </Carousel>
-        <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        <MainLayout />
 
-        <div>
+        <div className ="container1">
           <h1 className="h1">GIỚI THIỆU</h1>
 
           <div className="intro">
@@ -58,40 +56,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="list1">
-            <p className="text1">Phòng bếp</p>
-            <div className="imageContainer">
-              <img src="https://thhome.vn/wp-content/uploads/2021/06/noi-that-phong-an-phong-cach-scandinavian-2.jpg" alt="kitchen" className="image" />
-            </div>
-          </div>
-
-          <div className="list1">
-            <p className="text1">Phòng ngủ</p>
-            <div className="imageContainer">
-              <img src="https://noithattugia.com/wp-content/uploads/Phong-ngu-the-hien-ca-tinh-rieng-va-theo-so-thich-cua-chu-nhan-can-phong-noi-that-tu-gia.jpg" alt="bedroom" className="image" />
-            </div>
-          </div>
-
-          <div className="list1">
-            <p className="text1">Phòng tập gym</p>
-            <div className="imageContainer">
-              <img src="https://phumyhung.vn/wp-content/uploads/2020/11/Hung-Phuc-Premier-36-Copy.jpg" alt="gym" className="image" />
-            </div>
-          </div>
-
-          <div className="list1">
-            <p className="text1">Cửa hàng tiện lợi</p>
-            <div className="imageContainer">
-              <img src="https://cdn-www.vinid.net/2020/08/b65142c1-circlek-e1598600869576.jpg" alt="convenience store" className="image" />
-            </div>
-          </div>
-
-          <div className="list1">
-            <p className="text1">Sân vui chơi</p>
-            <div className="imageContainer">
-              <img src="https://mangtruot.com/wp-content/uploads/2020/12/tu-van-lap-dat-khu-vui-choi-ngoai-troi-cho-tre-em-tai-khu-chung-cu-5.jpg" alt="playground" className="image" />
-            </div>
-          </div>
+          {/* Add other sections similarly */}
         </div>
       </div>
       <Footer />

@@ -1,0 +1,6 @@
+.main-content {
+    margin-left: 200px; /* Adjusts content for the sidebar */
+    padding-top: 60px;  /* Adjusts content for the navbar */
+    min-height: 100vh;  /* Full height of the viewport */
+  }
+  
