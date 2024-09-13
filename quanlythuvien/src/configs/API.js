@@ -9,8 +9,8 @@ export const endpoints = {
 //   changePassword: '/api/residents/change-password/',
 //   changeAvatar: '/api/residents/change-avatar/',
   login: '/o/token/',
-
-//   product: '/api/product/',
+   danhmuc: '/api/danhmuc/',
+   sach: '/api/sach/',
 //   addProduct:'/api/cart/add-product/',
 //   cartSummary: '/api/cart/cart-summary/',
 //   updateProductQuantity: '/api/cart/update-product-quantity/',

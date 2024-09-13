@@ -1,9 +1,9 @@
 /* Sidebar styles */
 .sidebar {
-  width: 17%; /* Adjust based on your design */
-  height: 100vh;
+  width: 220px; /* Adjust based on your design */
+  height: 100%;
   position: fixed;
-  top: 10%;
+  top: 0;
   left: 0;
   background-color: #343a40; /* Dark background */
   color: white;
@@ -51,7 +51,7 @@
 }
 
 .bt-search:hover{
-  background-color: #4CAF50;
+  background-color: #4CAF50 !important;
   border: none;
 }
 
@@ -66,7 +66,7 @@
 }
 
 .text-brand:hover {
-  color: #4CAF50;
+  color: #4CAF50 !important;
 }
 
 .navbar-custom .nav-link:hover {
@@ -97,12 +97,7 @@
 }
 
 .content-wrapper {
-  margin-left: 18%;
-}
-
-.content-area {
-  padding: 20px;
-  margin-top: 70px; 
+  margin-left: 19%;
 }
 
 .img-avatar {

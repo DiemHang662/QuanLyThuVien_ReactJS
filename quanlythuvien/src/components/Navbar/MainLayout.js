@@ -1,19 +1,36 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Navbar, Container, Nav, Button, Form, FormControl } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
-import ReceiptIcon from '@mui/icons-material/Receipt';
 import ClassIcon from '@mui/icons-material/Class';
 import ChatIcon from '@mui/icons-material/Chat';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import BarChartIcon from '@mui/icons-material/BarChart';
+import BookIcon from '@mui/icons-material/Book';
 import { MyUserContext } from '../../configs/Contexts';
+import { authApi, endpoints } from '../../configs/API';
 import './MainLayout.css'; // Combined CSS for both Navbar and Sidebar
 
 const MainLayout = ({ children, searchTerm, setSearchTerm }) => {
+  const api = authApi();
   const user = useContext(MyUserContext);
+  const [categories, setCategories] = useState([]);
+
+  // Hàm gọi API lấy danh mục
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await api.get(endpoints.danhmuc); // Gọi API
+        setCategories(response.data); // Giả sử API trả về danh sách danh mục
+      } catch (error) {
+        console.error('Lỗi khi gọi API:', error);
+      }
+    };
+
+    fetchCategories(); // Gọi hàm
+  }, []);
 
   const handleSearch = () => {
     console.log('Searching for:', searchTerm);
@@ -25,6 +42,7 @@ const MainLayout = ({ children, searchTerm, setSearchTerm }) => {
 
   return (
     <div>
+      {/* Sidebar */}
       <div className="sidebar d-flex flex-column bg-dark text-primary">
         <div className="user-info p-5 text-center">
           {!user ? (
@@ -39,41 +57,46 @@ const MainLayout = ({ children, searchTerm, setSearchTerm }) => {
           )}
         </div>
 
+        {/* Hiển thị danh sách danh mục */}
         <Nav className="flex-column p-2">
           <Nav.Link as={Link} to="/" className="text-light">
             <HomeIcon className="me-3" /> Trang chủ
           </Nav.Link>
-          <Nav.Link as={Link} to="/category" className="text-light">
-            <ClassIcon className="me-3" /> Danh mục
-          </Nav.Link>
-          <Nav.Link as={Link} to="/chat" className="text-light">
-            <ChatIcon className="me-3" /> Chat
-          </Nav.Link>
-          <Nav.Link as={Link} to="/chart" className="text-light">
-            <BarChartIcon className="me-3" /> Báo cáo thống kê
-          </Nav.Link>
+          {categories.length > 0 ? (
+            categories.map(category => (
+              <Nav.Link as={Link} to={`/category/${category.id}`} key={category.id} className="text-light">
+                <ClassIcon className="me-3" /> {category.tenDanhMuc}
+              </Nav.Link>
+            ))
+          ) : (
+            <p className="text-light">Không có danh mục nào.</p>
+          )}
+
         </Nav>
       </div>
 
-      {/* Main content wrapper */}
+      {/* Main content */}
       <div className="content-wrapper">
-        {/* Top navbar */}
+        {/* Top Navbar */}
         <Navbar className="navbar-custom bg-white shadow-sm" expand="lg">
           <Container fluid>
-            <Navbar.Brand as={Link} to="/" className="text-brand me-5">
+            <Navbar.Brand as={Link} to="/" className="text-brand me-4">
               <AutoStoriesIcon /> LIBRARY
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="navbarScroll" />
             <Navbar.Collapse id="navbarScroll">
               <Nav className="me-auto my-5 my-lg-0">
-                <Nav.Link as={Link} to="/" className="me-4">
-                  Trang chủ
+                <Nav.Link as={Link} to="/" className="me-3">
+                  <HomeIcon/> Trang chủ
                 </Nav.Link>
-                <Nav.Link as={Link} to="/about" className="me-4">
-                  Mượn trả
+                <Nav.Link as={Link} to="/about" className="me-3">
+                 <BookIcon/> Mượn trả
                 </Nav.Link>
-                <Nav.Link as={Link} to="/contact" className="me-4">
-                  Liên hệ
+                <Nav.Link as={Link} to="/chat" className="me-3">
+                  <ChatIcon  /> Chat
+                </Nav.Link>
+                <Nav.Link as={Link} to="/chart" className="me-3">
+                  <BarChartIcon /> Báo cáo thống kê
                 </Nav.Link>
               </Nav>
               <Form className="d-flex">
