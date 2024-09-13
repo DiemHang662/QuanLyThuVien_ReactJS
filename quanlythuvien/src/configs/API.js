@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://192.168.195.124:8000';
+const BASE_URL = 'http://192.168.1.4:8000';
 
 export const endpoints = {
   docgia: '/api/docgia/',

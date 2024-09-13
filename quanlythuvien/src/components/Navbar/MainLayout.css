@@ -1,6 +1,112 @@
-.main-content {
-    margin-left: 200px; /* Adjusts content for the sidebar */
-    padding-top: 60px;  /* Adjusts content for the navbar */
-    min-height: 100vh;  /* Full height of the viewport */
-  }
-  
+/* Sidebar styles */
+.sidebar {
+  width: 17%; /* Adjust based on your design */
+  height: 100vh;
+  position: fixed;
+  top: 10%;
+  left: 0;
+  background-color: #343a40; /* Dark background */
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sidebar .nav-link {
+  font-size: 1rem;
+  color: white;
+  text-align: left;
+  width: 200px; /* Fixed width for sidebar links */
+  padding: 10px;
+  transition: background-color 0.3s ease, padding 0.3s ease;
+}
+
+.sidebar .nav-link:hover {
+  background-color: #4CAF50;
+}
+
+.navbar-custom {
+  position: fixed;
+  top: 0;
+  left: 0; 
+  width: 100%; 
+  background-color: #f8f9fa; 
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.navbar-custom .search-bar {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-custom input[type="search"] {
+  padding: 5px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.bt-search:hover{
+  background-color: #4CAF50;
+  border: none;
+}
+
+.navbar-custom .btn-login {
+  padding: 5px 10px;
+  border-radius: 50%;
+}
+
+.text-brand {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.text-brand:hover {
+  color: #4CAF50;
+}
+
+.navbar-custom .nav-link:hover {
+  background-color: #4CAF50; 
+  color: white; 
+}
+
+.navbar-custom .nav-link:hover,
+.navbar-custom .nav-link:focus {
+  background-color: #4CAF50; 
+  color: white;
+}
+
+.navbar-custom .nav-item {
+  padding: 0 10px;
+}
+
+.navbar-custom .nav-item a {
+  text-decoration: none;
+  color: black;
+  padding: 10px 15px; 
+}
+
+.navbar-custom .nav-item a:hover {
+  color: white;
+  background-color: #4CAF50;
+  transform: scale(1.05); 
+}
+
+.content-wrapper {
+  margin-left: 18%;
+}
+
+.content-area {
+  padding: 20px;
+  margin-top: 70px; 
+}
+
+.img-avatar {
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+}

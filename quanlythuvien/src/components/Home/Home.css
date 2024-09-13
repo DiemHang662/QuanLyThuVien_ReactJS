@@ -2,56 +2,90 @@
 @import "~slick-carousel/slick/slick-theme.css";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 
-/* Ensure the Home content stays within the viewport */
-.container-home {
-    background-color: whitesmoke;
-    margin-left: 150px; /* Adjust based on the sidebar width */
-    overflow: hidden; /* Prevent overflow */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
 }
 
-.container1{
-    margin-left:100px;
-    width:80%;
+.footer{
+    position: fixed;
+}
+
+.container {
+    display:flex;
+    flex-direction:column;
+    width: 100%;
+    height: 100%;
+}
+
+.main-layout {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    background-color: #f8f9fa;
+}
+
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 0 10px;
+    background-color: whitesmoke;
+    width: 94%;
+}
+
+.carousel {
+    width: 100%;
+}
+
+.carousel .carousel-inner {
+    width: 100%;
 }
 
 .img-carousel {
     width: 100%;
-    height: 200px;
+    height: 350px;
     object-fit: cover;
 }
 
-/* Adjust intro section layout */
 .intro {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
+    flex-wrap: wrap;
 }
 
-/* Control the width and height of the images in the intro */
 .imageIntro {
-    margin: 0 30px;
-    width: 40%;
+    width: 45%;
     height: 400px;
-    object-fit: cover; /* Ensure images stay within their container */
+    object-fit: cover;
+    margin: 10px 0;
+}
+
+@media (max-width: 768px) {
+    .imageIntro {
+        width: 100%;
+        height: 250px;
+    }
 }
 
 .h1, .h2, .h3 {
     color: green;
     font-weight: bold;
-    margin: 20px;
+    margin: 20px 0;
 }
 
 .h1 {
     text-align: left;
     font-size: 30px;
-    margin-left: 0; /* Remove large margin-left */
 }
 
 .h2 {
     text-align: right;
     font-size: 30px;
-    margin-right: 0; /* Adjust margin-right */
 }
 
 .h3 {
@@ -61,42 +95,53 @@
     padding-top: 20px;
 }
 
-/* Make text responsive and centered */
 .textIntro {
-    width: 45%;
-    padding: 5px;
+    width: 50%;
     text-align: justify;
-    font-size: 20px;
+    font-size: 18px;
     font-style: italic;
+    padding: 10px;
+    line-height: 1.6;
 }
 
-/* Ensure content layout adjusts responsively */
+@media (max-width: 768px) {
+    .textIntro {
+        width: 100%;
+        padding: 0;
+    }
+}
+
 .content {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    margin-top: 20px;
 }
 
-/* Each list item takes half the width of the container */
 .list1 {
-    width: 49%;
-    margin-bottom: 15px;
+    width: 48%;
+    margin-bottom: 20px;
 }
 
-/* Ensure images adjust to fit within their container */
+@media (max-width: 768px) {
+    .list1 {
+        width: 100%;
+    }
+}
+
 .imageContainer img {
-    margin: 0 30px;
-    width: 100%; /* Full width within container */
+    width: 100%;
     height: 300px;
     border: 1px solid green;
     object-fit: cover;
+    margin-bottom: 10px;
 }
 
 .imageContainer img:hover {
-    opacity: 0.6;
+    opacity: 0.8;
+    transition: opacity 0.3s;
 }
 
-/* Adjust text alignment */
 .text1 {
     color: darkgreen;
     text-align: center;
