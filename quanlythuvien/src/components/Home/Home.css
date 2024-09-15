@@ -68,16 +68,19 @@ h1{
     background-color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 24%; 
-    height: 360px;
+    height: 370px;
     overflow: hidden;
     text-align: center;
     margin: 10px 5px;
 }
 
 .book-item:hover {
-    opacity: 0.8;
-    
+    opacity: 0.8; 
 }
+
+.book-item.expanded {
+    height: 500px; 
+  }
 
 .add{
     background-color:white !important;
@@ -145,6 +148,13 @@ h1{
 
   .action-btn:focus {
     color: #1c74e2; 
+  }
+
+  .bt-comment{
+    margin-top: 5px;
+    font-size: 12px;
+    width: 30%;
+    height: 35px;
   }
 
   

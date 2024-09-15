@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Carousel, Button } from 'react-bootstrap';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Carousel, Button, Form, ListGroup } from 'react-bootstrap';
 import Footer from '../../components/Footer/Footer';
 import AddIcon from '@mui/icons-material/Add';
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import CommentIcon from '@mui/icons-material/Comment';
 import ShareIcon from '@mui/icons-material/Share';
+import SendIcon from '@mui/icons-material/Send';
 import './Home.css';
 import { authApi, endpoints } from '../../configs/API';
 import MainLayout from '../Navbar/MainLayout';
@@ -19,29 +20,63 @@ const Home = () => {
 
   const api = authApi();
   const [books, setBooks] = useState([]);
-  const [likedBooks, setLikedBooks] = useState(new Set()); // Use Set to track liked book IDs
+  const [likedBooks, setLikedBooks] = useState(new Set());
+  const [comments, setComments] = useState({});
+  const [commentInput, setCommentInput] = useState({});
+  const [visibleComments, setVisibleComments] = useState({});
+  const [expandedBooks, setExpandedBooks] = useState(new Set());
 
   // Fetch books on component mount
   useEffect(() => {
     const fetchBooks = async () => {
       try {
         const response = await api.get(endpoints.sach);
-        const booksData = response.data;
-        setBooks(booksData); // Remove sorting to keep books in their original order
+        setBooks(response.data);
       } catch (error) {
         console.error('Error fetching books:', error);
       }
     };
     fetchBooks();
-  }, [api]);
+  });
 
-  // Handle Like/Unlike action
+  const fetchComments = useCallback(async (bookId) => {
+    console.log(`Fetching comments for bookId: ${bookId}`);
+    try {
+      const response = await api.get(endpoints.binhluan(bookId));
+      console.log('Comments response:', response.data); // Log response
+      setComments((prev) => ({ ...prev, [bookId]: response.data }));
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
+  }, [api, endpoints]);
+  
+
+  const toggleComments = useCallback((bookId) => {
+    setVisibleComments((prev) => {
+      const isVisible = prev[bookId];
+      if (!isVisible) {
+        fetchComments(bookId); // Fetch comments if not already fetched
+      }
+      return { ...prev, [bookId]: !isVisible };
+    });
+    setExpandedBooks((prev) => {
+      const newExpanded = new Set(prev);
+      if (newExpanded.has(bookId)) {
+        newExpanded.delete(bookId);
+      } else {
+        newExpanded.add(bookId);
+      }
+      return newExpanded;
+    });
+  }, [fetchComments]);
+  
+
+  // Handle book like/unlike
   const handleLike = async (bookId) => {
     try {
       const isLiked = likedBooks.has(bookId);
       const response = await api.post(endpoints.toggle_like(bookId));
       if (response.status === 201 || response.status === 204) {
-        // Toggle like status
         setLikedBooks((prevLikes) => {
           const newLikes = new Set(prevLikes);
           if (isLiked) {
@@ -57,12 +92,28 @@ const Home = () => {
     }
   };
 
-  const getButtonColor = (bookId) => {
-    return likedBooks.has(bookId) ? '#1c74e2' : '#606770'; // Blue if liked, gray if not
+  const getButtonColor = (bookId) => likedBooks.has(bookId) ? '#1c74e2' : '#606770';
+  const isBookLiked = (bookId) => likedBooks.has(bookId);
+
+  // Handle comment input change
+  const handleCommentChange = (bookId, text) => {
+    setCommentInput((prev) => ({ ...prev, [bookId]: text }));
   };
 
-  // Check if the book is liked
-  const isBookLiked = (bookId) => likedBooks.has(bookId);
+  // Handle submitting a comment
+  const handleCommentSubmit = async (bookId) => {
+    try {
+      const response = await api.post(endpoints.create_comment(bookId), {
+        content: commentInput[bookId],
+      });
+      if (response.status === 201) {
+        setCommentInput((prev) => ({ ...prev, [bookId]: '' }));
+        fetchComments(bookId);
+      }
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+    }
+  };
 
   return (
     <div className="container">
@@ -85,7 +136,7 @@ const Home = () => {
         <div className="list">
           {books.length > 0 ? (
             books.map((book) => (
-              <div key={book.id} className="book-item">
+              <div key={book.id} className={`book-item ${expandedBooks.has(book.id) ? 'expanded' : ''}`}>
                 <img src={book.anhSach_url} className="book-image" alt={book.tenSach} />
                 <h3>{book.tenSach}</h3>
                 <h4>
@@ -112,13 +163,43 @@ const Home = () => {
                     Thích
                   </Button>
 
-                  <Button variant="link" className="action-btn">
+                  <Button
+                    variant="link"
+                    className="action-btn"
+                    onClick={() => toggleComments(book.id)}
+                  >
                     <CommentIcon className="action-icon" /> Bình luận
                   </Button>
+
                   <Button variant="link" className="action-btn">
                     <ShareIcon className="action-icon" /> Chia sẻ
                   </Button>
                 </div>
+
+                {visibleComments[book.id] && (
+                  <div className="comment-section">
+                    <ListGroup>
+                      {Array.isArray(comments[book.id]) && comments[book.id].length > 0 ? (
+                        comments[book.id].map((comment) => (
+                          <ListGroup.Item key={comment.id}>
+                            {comment.user.first_name} {comment.user.last_name}: {comment.content}
+                          </ListGroup.Item>
+                        ))
+                      ) : (
+                        <p>Chưa có bình luận nào.</p>
+                      )}
+                    </ListGroup>
+
+                    <Form.Control
+                      as="textarea"
+                      rows={2}
+                      value={commentInput[book.id] || ''}
+                      onChange={(e) => handleCommentChange(book.id, e.target.value)}
+                      placeholder="Viết bình luận..."
+                    />
+                    <Button className="bt-comment" onClick={() => handleCommentSubmit(book.id)}><SendIcon /> Gửi</Button>
+                  </div>
+                )}
               </div>
             ))
           ) : (

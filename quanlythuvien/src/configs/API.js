@@ -12,6 +12,8 @@ export const endpoints = {
   danhmuc: '/api/danhmuc/',
   sach: '/api/sach/',
   toggle_like: (bookId) => `/api/thich/${bookId}/toggle-like/`,
+  binhluan: (bookId) => `/api/binhluan/${bookId}/`,
+  create_comment: (bookId) => `/api/binhluan/${bookId}/create-comment/`,
 };
 
 export const setAuthToken = (token) => {
