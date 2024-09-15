@@ -1,14 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Navbar, Container, Nav, Button, Form, FormControl } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Navbar, Container, Nav, Button, Form, FormControl, Dropdown } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
-import ClassIcon from '@mui/icons-material/Class';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 import ChatIcon from '@mui/icons-material/Chat';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import BookIcon from '@mui/icons-material/Book';
+import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import { MyUserContext } from '../../configs/Contexts';
 import { authApi, endpoints } from '../../configs/API';
 import './MainLayout.css'; // Combined CSS for both Navbar and Sidebar
@@ -17,19 +18,20 @@ const MainLayout = ({ children, searchTerm, setSearchTerm }) => {
   const api = authApi();
   const user = useContext(MyUserContext);
   const [categories, setCategories] = useState([]);
+  const navigate = useNavigate(); // For navigating to login or logout
 
-  // Hàm gọi API lấy danh mục
+  // Fetch categories for the sidebar
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await api.get(endpoints.danhmuc); // Gọi API
-        setCategories(response.data); // Giả sử API trả về danh sách danh mục
+        const response = await api.get(endpoints.danhmuc);
+        setCategories(response.data);
       } catch (error) {
-        console.error('Lỗi khi gọi API:', error);
+        console.error('Error fetching categories:', error);
       }
     };
 
-    fetchCategories(); // Gọi hàm
+    fetchCategories();
   }, []);
 
   const handleSearch = () => {
@@ -40,13 +42,16 @@ const MainLayout = ({ children, searchTerm, setSearchTerm }) => {
     setSearchTerm(e.target.value);
   };
 
+  const handleLogout = () => {
+    navigate('/login');
+  };
+
   return (
     <div>
-      {/* Sidebar */}
       <div className="sidebar d-flex flex-column bg-dark text-primary">
-        <div className="user-info p-5 text-center">
+        <div className="user-info p-3 mt-5 text-center">
           {!user ? (
-            <Nav.Link as={Link} to="/profile" className="d-flex flex-column align-items-center">
+            <Nav.Link as={Link} to="/login" className="d-flex flex-column align-items-center">
               <div>NGƯỜI DÙNG CHƯA ĐĂNG NHẬP</div>
             </Nav.Link>
           ) : (
@@ -57,7 +62,7 @@ const MainLayout = ({ children, searchTerm, setSearchTerm }) => {
           )}
         </div>
 
-        {/* Hiển thị danh sách danh mục */}
+        {/* Categories in the sidebar */}
         <Nav className="flex-column p-2">
           <Nav.Link as={Link} to="/" className="text-light">
             <HomeIcon className="me-3" /> Trang chủ
@@ -65,13 +70,12 @@ const MainLayout = ({ children, searchTerm, setSearchTerm }) => {
           {categories.length > 0 ? (
             categories.map(category => (
               <Nav.Link as={Link} to={`/category/${category.id}`} key={category.id} className="text-light">
-                <ClassIcon className="me-3" /> {category.tenDanhMuc}
+                <MenuBookIcon className="me-3" /> {category.tenDanhMuc}
               </Nav.Link>
             ))
           ) : (
             <p className="text-light">Không có danh mục nào.</p>
           )}
-
         </Nav>
       </div>
 
@@ -81,24 +85,36 @@ const MainLayout = ({ children, searchTerm, setSearchTerm }) => {
         <Navbar className="navbar-custom bg-white shadow-sm" expand="lg">
           <Container fluid>
             <Navbar.Brand as={Link} to="/" className="text-brand me-4">
-              <AutoStoriesIcon /> LIBRARY
+              <AutoStoriesIcon /> VNLIBRARY
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="navbarScroll" />
             <Navbar.Collapse id="navbarScroll">
               <Nav className="me-auto my-5 my-lg-0">
                 <Nav.Link as={Link} to="/" className="me-3">
-                  <HomeIcon/> Trang chủ
+                  <HomeIcon /> Trang chủ
                 </Nav.Link>
                 <Nav.Link as={Link} to="/about" className="me-3">
-                 <BookIcon/> Mượn trả
+                  <BookIcon /> Mượn trả
                 </Nav.Link>
                 <Nav.Link as={Link} to="/chat" className="me-3">
-                  <ChatIcon  /> Chat
+                  <ChatIcon /> Chat
                 </Nav.Link>
                 <Nav.Link as={Link} to="/chart" className="me-3">
                   <BarChartIcon /> Báo cáo thống kê
                 </Nav.Link>
+
+                {/* Dropdown for additional options */}
+                <Dropdown>
+                  <Dropdown.Toggle variant="light" id="dropdown-basic">
+                    Khác
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item as={Link}>Độc giả</Dropdown.Item>
+                    <Dropdown.Item as={Link}>Sách</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
               </Nav>
+
               <Form className="d-flex">
                 <FormControl
                   type="search"
@@ -112,14 +128,29 @@ const MainLayout = ({ children, searchTerm, setSearchTerm }) => {
                   <SearchIcon />
                 </Button>
               </Form>
+
               {!user ? (
                 <Button as={Link} to="/login" className="btn-login ms-3" variant="outline-dark">
                   <AccountCircleIcon />
                 </Button>
               ) : (
-                <Nav.Link as={Link} to="/profile" className="d-flex align-items-center ms-3">
-                  <img src={user.avatar_url} alt="Avatar" className="img-avatar rounded-circle" />
+                <>
+                 <Nav.Link as={Link} to="/profile" className="d-flex flex-column align-items-center ms-4">
+                    <LibraryAddIcon />
                 </Nav.Link>
+
+                <Dropdown align="end" className="ms-3">
+                  <Dropdown.Toggle variant="light" className="d-flex align-items-center">
+                    <img src={user.avatar_url} alt="Avatar" className="img-avatar rounded-circle" />
+                  </Dropdown.Toggle>
+
+                  <Dropdown.Menu>
+                    <Dropdown.Item as={Link} to="/profile">Xem thông tin</Dropdown.Item>
+                    <Dropdown.Divider />
+                    <Dropdown.Item onClick={handleLogout}>Đăng xuất</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+                </>
               )}
             </Navbar.Collapse>
           </Container>

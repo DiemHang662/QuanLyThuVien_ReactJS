@@ -22,8 +22,8 @@ const Login = () => {
       const formData = new URLSearchParams();
       formData.append('username', username);
       formData.append('password', password);
-      formData.append('client_id', '6soLLAM8xzVO9b9NsCHYjlpVofo6ffnOQXmqZ3Cx');
-      formData.append('client_secret', 'd79fQbAM5JMDOUV0Q1uP5RVERQLBgGicqdVXnM6tJTCjAeSPpLHZrtaoePWLRepklFSApvM7P89gpQyqO5WCO3sJrWrLt7nafV23EsTnO7pLWv6QIpaTAFIodFnX8ZBs');
+      formData.append('client_id', '6DOFrym6Hme0c79oOOW5CiSLWXde8CkES8RnSsnE');
+      formData.append('client_secret', 'RIzsTv5dKkIMcnJVlNzhwkbwEEbLEEKhyXLIywbBdaAXJ3ZzVNrHd80BOthil8h6PdnU7uxBMgs02UWFmpzNl6N0XpCvcNuiKyU8kaLit3zuAU0SbDjG9iaoXtJMct5y');
       formData.append('grant_type', 'password');
 
       const config = {

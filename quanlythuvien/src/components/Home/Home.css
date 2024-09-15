@@ -68,7 +68,7 @@ h1{
     background-color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 24%; 
-    height: 330px;
+    height: 360px;
     overflow: hidden;
     text-align: center;
     margin: 10px 5px;
@@ -83,8 +83,9 @@ h1{
     background-color:white !important;
     color:#4CAF50 !important;
     border: 1px solid #4CAF50 !important;
-    width: 55%;
-    margin-left: 10px;
+    width: 54%;
+    height: 38px;
+    margin-left: 5px;
     font-weight: 400;
   }
 
@@ -103,13 +104,49 @@ h1{
 
 .book-item h3 {
     margin: 10px 0;
-    color: #333;
+    color: crimson;
     font-size: 14px;
 }
+
+
+.book-item h4 {
+    margin: 10px 0;
+    color: dodgerblue;
+    font-size: 12px;
+}
+
 
 .book-item p {
     font-size: 1rem;
     color: #666;
     padding: 0 10px;
 }
+
+.action-buttons {
+    display: flex;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+  
+  .action-btn {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #606770;
+    font-size: 12px;
+    padding: 0;
+    margin: 0 6px;
+    transition: color 0.2s ease;
+  }
+  
+  .action-btn:hover {
+    color: #1c74e2; 
+  }
+
+  .action-btn:focus {
+    color: #1c74e2; 
+  }
+
+  
+  
 
