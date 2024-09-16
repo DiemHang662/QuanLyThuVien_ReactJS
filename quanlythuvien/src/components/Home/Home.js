@@ -17,7 +17,6 @@ const Home = () => {
     'https://file.hstatic.net/200000090679/file/z5679281412660_7636cf5aa93594064a10a52aa07b23cf.jpg',
     'https://tiki.vn/blog/wp-content/uploads/2023/08/thumb-12.jpg',
   ];
-
   const api = authApi();
   const [books, setBooks] = useState([]);
   const [likedBooks, setLikedBooks] = useState(new Set());
@@ -26,30 +25,31 @@ const Home = () => {
   const [visibleComments, setVisibleComments] = useState({});
   const [expandedBooks, setExpandedBooks] = useState(new Set());
 
-  // Fetch books on component mount
   useEffect(() => {
     const fetchBooks = async () => {
       try {
         const response = await api.get(endpoints.sach);
-        setBooks(response.data);
+        let booksData = response.data;
+        booksData = booksData.sort(() => Math.random() - 0.5);
+        setBooks(booksData);
       } catch (error) {
-        console.error('Error fetching books:', error);
+        console.error('Lỗi khi gọi API sách:', error);
       }
     };
     fetchBooks();
-  });
+  }, []);
 
   const fetchComments = useCallback(async (bookId) => {
     console.log(`Fetching comments for bookId: ${bookId}`);
     try {
       const response = await api.get(endpoints.binhluan(bookId));
-      console.log('Comments response:', response.data); // Log response
+      console.log('Comments response:', response.data);
       setComments((prev) => ({ ...prev, [bookId]: response.data }));
     } catch (error) {
       console.error('Error fetching comments:', error);
     }
-  }, [api, endpoints]);
-  
+  }, []);
+
 
   const toggleComments = useCallback((bookId) => {
     setVisibleComments((prev) => {
@@ -69,7 +69,7 @@ const Home = () => {
       return newExpanded;
     });
   }, [fetchComments]);
-  
+
 
   // Handle book like/unlike
   const handleLike = async (bookId) => {
@@ -119,25 +119,33 @@ const Home = () => {
     <div className="container">
       <MainLayout />
       <div className="content-wrapper">
-        {/* Carousel */}
         <Carousel className="carousel">
           {images.map((image, index) => (
             <Carousel.Item key={index}>
-              <img className="d-block img-carousel" src={image} alt={`slide-${index}`} />
+              <img
+                className="d-block img-carousel"
+                src={image}
+                alt={`slide-${index}`}  // Corrected template literal usage
+              />
             </Carousel.Item>
+
           ))}
         </Carousel>
 
         <h1>GIỚI THIỆU</h1>
         <div className="intro">
-          {/* Add introduction content here */}
+          {/* Giới thiệu nội dung */}
         </div>
 
         <div className="list">
           {books.length > 0 ? (
             books.map((book) => (
               <div key={book.id} className={`book-item ${expandedBooks.has(book.id) ? 'expanded' : ''}`}>
-                <img src={book.anhSach_url} className="book-image" alt={book.tenSach} />
+                <img
+                  src={book.anhSach_url}
+                  className="book-image"
+                  alt="Book"
+                />
                 <h3>{book.tenSach}</h3>
                 <h4>
                   <strong>Tác giả: </strong> {book.tenTacGia}
@@ -147,7 +155,6 @@ const Home = () => {
                   <AddIcon /> Mượn sách
                 </Button>
 
-                {/* Like/Unlike button with dynamic style */}
                 <div className="action-buttons mt-3">
                   <Button
                     variant="link"
@@ -182,7 +189,8 @@ const Home = () => {
                       {Array.isArray(comments[book.id]) && comments[book.id].length > 0 ? (
                         comments[book.id].map((comment) => (
                           <ListGroup.Item key={comment.id}>
-                            {comment.user.first_name} {comment.user.last_name}: {comment.content}
+                            <img src={comment.user.avatar_url} alt="Avatar" className="img-avatar rounded-circle" />
+                            <strong>{comment.user.first_name} {comment.user.last_name}:</strong> {comment.content}
                           </ListGroup.Item>
                         ))
                       ) : (
@@ -190,14 +198,23 @@ const Home = () => {
                       )}
                     </ListGroup>
 
-                    <Form.Control
-                      as="textarea"
-                      rows={2}
-                      value={commentInput[book.id] || ''}
-                      onChange={(e) => handleCommentChange(book.id, e.target.value)}
-                      placeholder="Viết bình luận..."
-                    />
-                    <Button className="bt-comment" onClick={() => handleCommentSubmit(book.id)}><SendIcon /> Gửi</Button>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <Form.Control
+                        as="textarea"
+                        rows={1}
+                        value={commentInput[book.id] || ''}
+                        onChange={(e) => handleCommentChange(book.id, e.target.value)}
+                        placeholder="Viết bình luận..."
+                        style={{ marginLeft:'5px', marginTop: '5px', borderRadius: '15px', flexGrow: 1, fontSize:'12px' }} 
+                      />
+                      <Button
+                        variant="link"
+                        className="bt-comment"
+                        onClick={() => handleCommentSubmit(book.id)}
+                      >
+                        <SendIcon />
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -212,5 +229,4 @@ const Home = () => {
     </div>
   );
 };
-
 export default Home;

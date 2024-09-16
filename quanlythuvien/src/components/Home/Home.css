@@ -79,7 +79,17 @@ h1{
 }
 
 .book-item.expanded {
-    height: 500px; 
+    height: auto; 
+  }
+
+  .comment-section{
+    font-size: 10px;
+  }
+
+  .img-avatar {
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
   }
 
 .add{
@@ -151,10 +161,9 @@ h1{
   }
 
   .bt-comment{
-    margin-top: 5px;
-    font-size: 12px;
-    width: 30%;
-    height: 35px;
+    margin: 5px 0;
+    width: 15%;
+    height: 40px;
   }
 
   

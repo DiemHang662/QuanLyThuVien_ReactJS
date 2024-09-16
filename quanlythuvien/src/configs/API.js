@@ -12,7 +12,7 @@ export const endpoints = {
   danhmuc: '/api/danhmuc/',
   sach: '/api/sach/',
   toggle_like: (bookId) => `/api/thich/${bookId}/toggle-like/`,
-  binhluan: (bookId) => `/api/binhluan/${bookId}/`,
+  binhluan: (bookId) => `api/binhluan/?sach_id=${bookId}`,
   create_comment: (bookId) => `/api/binhluan/${bookId}/create-comment/`,
 };
 
