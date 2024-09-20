@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://192.168.1.6:8000';
+const BASE_URL = 'http://192.168.1.7:8000';
 
 export const endpoints = {
   docgia: '/api/docgia/',
-  //   createNewAccount: '/api/residents/create-new-account/',
+  createUser: '/api/nguoidung/create-user/',
   currentUser: '/api/nguoidung/current-user/',
   //   changePassword: '/api/residents/change-password/',
   //   changeAvatar: '/api/residents/change-avatar/',

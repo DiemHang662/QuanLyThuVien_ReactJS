@@ -1,0 +1,33 @@
+.container-login {
+    display: flex;
+    width: 100vw; /* Full width of the viewport */
+    height: 110vh; /* Full height of the viewport */
+    background-color: whitesmoke;
+    background-image: url('https://watermark.lovepik.com/photo/20211123/large/lovepik-library-interior-decoration-effect-map-picture_500778570.jpg');
+    background-size: cover;
+    background-position: center;
+    justify-content: center;
+    align-items: center;
+    color: black;
+    padding: 0; /* Remove padding to ensure full width and height */
+}
+
+.formLogin{
+    width: 50%;
+    height: 400px;
+    background-color: whitesmoke;
+    box-shadow: 0 4px 7px rgba(48, 50, 51, 0.6); /* Softer shadow */
+    box-sizing: border-box;
+}
+
+.form-group {
+    margin: 15px 0;
+}
+
+.input {
+    background-color: rgb(232, 241, 249);
+    width: 95%;
+    margin-top: 20px;
+    margin-left: 15px;
+    margin-right: 15px;
+}

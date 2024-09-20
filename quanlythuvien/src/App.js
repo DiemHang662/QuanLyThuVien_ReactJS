@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Home from './components/Home/Home';
 import DocGiaList from './components/NguoiDung/DocGiaList';
+import Register from './components/NguoiDung/Register';
 import Login from './components/NguoiDung/Login';
 import './App.css';
 import { MyUserContext } from './configs/Contexts';
@@ -16,6 +17,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/docgia" element={user ? <DocGiaList /> : <Navigate to="/login" />} />
+          <Route path="/dangki" element={user ? <Register /> : <Navigate to="/login" />} />
           <Route path="/danhmuc" element={user ? <MainLayout /> : <Navigate to="/login" />} />
           <Route path="/sach" element={user ? <Home /> : <Navigate to="/login" />} />
           <Route path="/login" element={<Login />} /> 

@@ -99,18 +99,16 @@ const MainLayout = ({ children, searchTerm, setSearchTerm }) => {
                 <Nav.Link as={Link} to="/chat" className="me-3">
                   <ChatIcon /> Chat
                 </Nav.Link>
-                <Nav.Link as={Link} to="/chart" className="me-3">
-                  <BarChartIcon /> Báo cáo thống kê
-                </Nav.Link>
-
                 {/* Dropdown for additional options */}
                 <Dropdown>
                   <Dropdown.Toggle variant="light" id="dropdown-basic">
                     Khác
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
-                    <Dropdown.Item as={Link}>Độc giả</Dropdown.Item>
-                    <Dropdown.Item as={Link}>Sách</Dropdown.Item>
+                    <Dropdown.Item as={Link} to="/docgia">Độc giả</Dropdown.Item>
+                    <Dropdown.Item as={Link} to="/sach">Sách</Dropdown.Item>
+                    <Dropdown.Item as={Link} to="/dangki">Đăng ký</Dropdown.Item>
+                    <Dropdown.Item as={Link} to="/chart">Báo cáo thống kê</Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
               </Nav>

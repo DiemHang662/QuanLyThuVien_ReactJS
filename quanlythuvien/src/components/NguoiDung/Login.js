@@ -66,6 +66,7 @@ const Login = () => {
   return (
     <div className="background">
       <div className="container-login">
+        <div className="formLogin">
         <h1 className="title">ĐĂNG NHẬP</h1>
         <Form>
           <Form.Group controlId="formBasicUserType">
@@ -118,6 +119,7 @@ const Login = () => {
           </Button>
         </Form>
       </div>
+    </div>
     </div>
   );
 };
