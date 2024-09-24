@@ -3,14 +3,39 @@ import axios from 'axios';
 const BASE_URL = 'http://192.168.1.7:8000';
 
 export const endpoints = {
-  docgia: '/api/docgia/',
+  nguoidung: '/api/nguoidung/',
+  lockAccount: (id) => `/api/nguoidung/${id}/lock-account/`,
   createUser: '/api/nguoidung/create-user/',
+  deleteUser: (id) => `/api/nguoidung/${id}/delete-user/`,
+  updateUser: (id) => `/api/nguoidung/${id}/`,
   currentUser: '/api/nguoidung/current-user/',
+  userCount:'/api/nguoidung/user-count/',
   //   changePassword: '/api/residents/change-password/',
   //   changeAvatar: '/api/residents/change-avatar/',
   login: '/o/token/',
+
   danhmuc: '/api/danhmuc/',
+  createDanhMuc: '/api/danhmuc/create-danhmuc/',
+  deleteDanhMuc: (id) => `/api/danhmuc/${id}/delete-danhmuc/`,
+  updateDanhMuc: (id) => `/api/danhmuc/${id}/`,
+
   sach: '/api/sach/',
+  sachByDanhMuc: (danhMucId) => `api/sach/by-danhmuc/?danhmuc=${danhMucId}`,
+  createSach: '/api/sach/create-sach/',
+  deleteSach: (id) => `/api/sach/${id}/delete-sach/`,
+  updateSach: (id) => `/api/sach/${id}/`,
+  bookCount:'/api/sach/book-count/',
+
+  phieuMuon: '/api/phieumuon/',
+  createPhieuMuon: '/api/phieumuon/create-phieumuon/',
+  deletePhieuMuon: (id) => `/api/phieumuon/${id}/delete-phieumuon/`,
+  updatePhieuMuon: (id) => `/api/phieumuon/${id}/`,
+
+  chiTietPhieuMuon: '/api/chitietphieumuon/',
+  createChiTietPhieuMuon: '/api/chitietphieumuon/create-ctpm/',
+  deleteChiTietPhieuMuon: (id) => `/api/chitietphieumuon/${id}/delete-ctpm/`,
+  updateChiTietPhieuMuon: (id) => `/api/chitietphieumuon/${id}/`,
+
   toggle_like: (bookId) => `/api/thich/${bookId}/toggle-like/`,
   binhluan: (bookId) => `api/binhluan/?sach_id=${bookId}`,
   create_comment: (bookId) => `/api/binhluan/${bookId}/create-comment/`,
