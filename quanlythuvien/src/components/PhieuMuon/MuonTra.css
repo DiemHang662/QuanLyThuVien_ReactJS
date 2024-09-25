@@ -7,3 +7,40 @@
     font-size: 30px;
     text-transform: uppercase;
 }
+
+.action-buttons-mt{
+    display: flex;
+}
+
+.detail-mt{
+    margin-right: 5px;
+}
+
+.anhsach{
+    width: 40px;
+}
+
+.create-ctpm-form {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 50px; /* Margin around the form */
+}
+
+.form-row {
+    display: flex; /* Use flexbox for the row */
+    justify-content: center; /* Center the select boxes */
+    margin-bottom: 20px; /* Space below the row */
+}
+
+.form-row > div {
+    margin: 0 10px; /* Space between select boxes */
+    flex: 1; /* Allow select boxes to take equal width */
+}
+
+.btn-submit {
+    margin-top: 10px; 
+    width: 100%; 
+    max-width: 300px; 
+    display: block; 
+}
+

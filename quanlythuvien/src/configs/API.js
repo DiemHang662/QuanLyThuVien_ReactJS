@@ -32,9 +32,11 @@ export const endpoints = {
   updatePhieuMuon: (id) => `/api/phieumuon/${id}/`,
 
   chiTietPhieuMuon: '/api/chitietphieumuon/',
-  createChiTietPhieuMuon: '/api/chitietphieumuon/create-ctpm/',
-  deleteChiTietPhieuMuon: (id) => `/api/chitietphieumuon/${id}/delete-ctpm/`,
+  createChiTietPhieuMuon: '/api/chitietphieumuon/',
+  deleteChiTietPhieuMuon: (id) => `/api/chitietphieumuon/${id}/`,
   updateChiTietPhieuMuon: (id) => `/api/chitietphieumuon/${id}/`,
+
+  borrowedBooks: (id) => `/api/nguoidung/${id}/borrowed-books/`,
 
   toggle_like: (bookId) => `/api/thich/${bookId}/toggle-like/`,
   binhluan: (bookId) => `api/binhluan/?sach_id=${bookId}`,
