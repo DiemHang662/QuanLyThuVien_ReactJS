@@ -100,10 +100,10 @@ const MainLayout = ({ children, searchTerm, setSearchTerm, onSearch }) => {
                   <Dropdown.Menu>
                     <Dropdown.Item as={Link} to="/nguoidung">Người dùng</Dropdown.Item>
                     <Dropdown.Item as={Link} to="/dssach">Sách</Dropdown.Item>
-                    <Dropdown.Item as={Link} to="/muonsach">Mượn trả sách</Dropdown.Item>
+                    <Dropdown.Item as={Link} to="/muontra">Mượn trả sách</Dropdown.Item>
                     <Dropdown.Item as={Link} to="/phieumuon">Lập phiếu mượn</Dropdown.Item>
                     <Dropdown.Item as={Link} to="/dangki">Đăng ký</Dropdown.Item>
-                    <Dropdown.Item as={Link} to="/chart">Báo cáo thống kê</Dropdown.Item>
+                    <Dropdown.Item as={Link} to="/bctk">Báo cáo thống kê</Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
               </Nav>

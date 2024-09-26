@@ -1,0 +1,73 @@
+.chart-container {
+    width: 100%;
+    background-color: #f9f9f9; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    margin-bottom: 30px;
+}
+
+h1 {
+    text-align: center; 
+    color: #333; 
+    margin-bottom: 20px; 
+}
+
+.select-container {
+    text-align: center; 
+    margin-bottom: 20px; 
+}
+
+h3{
+    font-size: 17px;
+}
+
+h6{
+    margin: 10px 50px;
+    padding: 5px;
+    text-align: left;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.form-select1 {
+    padding: 10px;
+    border: 1px solid #ddd; 
+    border-radius: 5px; 
+    width:500px;
+    font-size: 16px;
+    outline: none; 
+    transition: border-color 0.3s; 
+    margin-left: 50px;
+}
+
+.form-select1:hover, .form-select1:focus {
+    box-shadow: 0 4px 8px rgba(67, 144, 61, 0.4); 
+    border-color:#28a745; 
+    opacity: 0.6;
+}
+
+.chart-wrapper {
+    margin: auto 50px;
+}
+
+.loading, .error {
+    text-align: center; 
+    color: #ff0000; 
+    margin-top: 20px; 
+}
+
+.pie-charts {
+    display: flex;
+    justify-content: space-between; 
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.pie-chart {
+    flex: 1 1 250px; 
+    margin: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+    padding: 5px; 
+    background: #fff; 
+}
+

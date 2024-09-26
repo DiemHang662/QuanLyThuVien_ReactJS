@@ -7,7 +7,7 @@ import { authApi, endpoints } from '../../configs/API';  // Adjust API config pa
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import './SachList.css'; // CSS for styling
+import './SachList.css'; 
 
 const SachList = () => {
     const api = authApi();

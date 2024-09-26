@@ -38,6 +38,15 @@ export const endpoints = {
 
   borrowedBooks: (id) => `/api/nguoidung/${id}/borrowed-books/`,
 
+  mostBorrowed: '/api/sach/most-borrowed/',
+  mostLiked: '/api/sach/most-liked/',
+  mostCommented: '/api/sach/most-commented/',
+  mostReturnedBooks: '/api/sach/most-returned-books/',
+  mostBorrowedBooks: '/api/sach/most-borrowed-books/',
+  mostLateBooks: '/api/sach/most-late-books/',
+  interCount: '/api/sach/total-interactions/',
+  borrowReturnCount: '/api/sach/total-borrow-return-counts/',
+
   toggle_like: (bookId) => `/api/thich/${bookId}/toggle-like/`,
   binhluan: (bookId) => `api/binhluan/?sach_id=${bookId}`,
   create_comment: (bookId) => `/api/binhluan/${bookId}/create-comment/`,

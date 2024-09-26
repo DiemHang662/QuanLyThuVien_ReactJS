@@ -6,6 +6,7 @@ import NguoiDungList from './components/NguoiDung/NguoiDungList';
 import Register from './components/NguoiDung/Register';
 import Login from './components/NguoiDung/Login';
 import SachList from './components/Sach/SachList';
+import MuonTraChart from './components/Sach/MuonTraChart';
 import PhieuMuonList from './components/PhieuMuon/PhieuMuonList';
 import MuonTra from './components/PhieuMuon/MuonTra';
 import './App.css';
@@ -26,8 +27,9 @@ function App() {
           <Route path="/danhmuc" element={user ? <MainLayout /> : <Navigate to="/login" />} />
           <Route path="/sach" element={user ? <Home /> : <Navigate to="/login" />} />
           <Route path="/dssach" element={user ? <SachList /> : <Navigate to="/login" />} />
+          <Route path="/bctk" element={user ? <MuonTraChart /> : <Navigate to="/login" />} />
           <Route path="/phieumuon" element={user ? <PhieuMuonList /> : <Navigate to="/login" />} />
-          <Route path="/muonsach" element={user ? <MuonTra /> : <Navigate to="/login" />} />
+          <Route path="/muontra" element={user ? <MuonTra /> : <Navigate to="/login" />} />
           <Route path="/login" element={<Login />} /> 
         </Routes>
       </div>
