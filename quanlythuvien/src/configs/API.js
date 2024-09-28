@@ -20,6 +20,7 @@ export const endpoints = {
   updateDanhMuc: (id) => `/api/danhmuc/${id}/`,
 
   sach: '/api/sach/',
+  sachChiTiet: (id) => `/api/sach/${id}/`,
   sachByDanhMuc: (danhMucId) => `api/sach/by-danhmuc/?danhmuc=${danhMucId}`,
   createSach: '/api/sach/create-sach/',
   deleteSach: (id) => `/api/sach/${id}/delete-sach/`,

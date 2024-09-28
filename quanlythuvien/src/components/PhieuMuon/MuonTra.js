@@ -134,7 +134,7 @@ const MuonTra = () => {
                             <option value="">Chọn phiếu mượn</option>
                             {loanSlips.map(loanSlip => (
                                 <option key={loanSlip.id} value={loanSlip.id}>
-                                    {loanSlip.id} - Phiếu mượn của: {loanSlip.first_name} {loanSlip.last_name}
+                                    {loanSlip.id} - {loanSlip.first_name} {loanSlip.last_name} - {loanSlip.ngayMuon} - {loanSlip.ngayTraDuKien}
                                 </option>
                             ))}
                         </Form.Control>

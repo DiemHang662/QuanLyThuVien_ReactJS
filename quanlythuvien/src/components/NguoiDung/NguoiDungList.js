@@ -71,10 +71,28 @@ const NguoiDungList = () => {
         e.preventDefault();
         if (editUser) {
             try {
+                const formData = new FormData();
+                formData.append('first_name', editUser.first_name);
+                formData.append('last_name', editUser.last_name);
+                formData.append('username', editUser.username);
+                formData.append('phone', editUser.phone || '');
+                formData.append('email', editUser.email || '');
+                if (editUser.avatar) {
+                    formData.append('avatar', editUser.avatar);
+                }
+
                 if (editUser.id) {
-                    await api.patch(endpoints.updateUser(editUser.id), editUser);
+                    await api.patch(endpoints.updateUser(editUser.id), formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
                 } else {
-                    await api.post(endpoints.createUser, editUser);
+                    await api.post(endpoints.createUser, formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
                 }
                 const response = await api.get(endpoints.nguoidung);
                 setUsers(response.data);
@@ -85,6 +103,7 @@ const NguoiDungList = () => {
             }
         }
     };
+
 
     return (
         <>
@@ -246,6 +265,20 @@ const NguoiDungList = () => {
                                     required
                                 />
                             </Form.Group>
+                            <Form.Group controlId="avatar">
+                                <Form.Label>Ảnh đại diện</Form.Label>
+                                <Form.Control
+                                    type="file"
+                                    onChange={(e) => setEditUser({ ...editUser, avatar: e.target.files[0] })}
+                                    accept="image/*"
+                                />
+                                {editUser?.avatar_url && (
+                                    <div>
+                                        <Image src={editUser.avatar_url} className="avatar-preview" thumbnail />
+                                    </div>
+                                )}
+                            </Form.Group>
+
                             <Form.Group controlId="is_superuser">
                                 <Form.Check
                                     type="checkbox"
