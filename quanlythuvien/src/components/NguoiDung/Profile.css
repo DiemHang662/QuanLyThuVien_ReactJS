@@ -3,15 +3,31 @@
     color:#218838;
 }
 
+.user-profile img{
+    width: 100%;
+    margin: 20px 60px;
+    height: 400px;
+}
+
 .history-book{
     color:#218838;
     font-size: 25px;
+    text-align: center;
+    padding: 10px;
+    margin: 10px 20px;
+    border-bottom: 1px solid #218838;
+    width: 450px;
 }
 
+.currentUser{
+    text-align: center;
+    margin: 10px 60px;
+}
 
 .card {
-    width: 80%;
-    margin: 0 auto; 
+    width: 90%;
+    height: 430px;
+    margin: 0 auto;
 }
 
 .card-img-top {
@@ -20,6 +36,18 @@
     object-fit: cover; 
 }
 
+.about{
+    padding: 10px;
+    font-size: 20px;
+    text-align: left;
+}
+
+.hello-user{
+    font-size: 25px;
+    text-transform: uppercase;
+    color: red;
+    text-align: center;
+}
 
 .card-title {
     font-size: 18px; 
@@ -29,6 +57,53 @@
 }
 
 .card-text {
-    font-size: 0.9rem; /* Giảm kích thước chữ trong nội dung thẻ */
+    font-size: 15px; 
     margin-bottom: 8px;
 }
+
+.change-password{
+    margin-right: 10px;
+}
+
+.payment-button {
+    display: flex;
+    align-items: center; 
+    width: 100%; 
+    margin-bottom: 10px; 
+}
+
+.payment-button{
+    height: 50px !important;
+}
+
+.payment-button img {
+    width: 40px !important;
+    margin-right: 10px;
+}
+
+.momo {
+    background-color: #D82D8B;
+}
+
+.zalo {
+    background-color: dodgerblue; 
+}
+
+.money {
+    background-color: white; 
+    color: #218838;
+    border: 1px solid #218838;
+}
+
+.momo:hover {
+    background-color: #bb2678;
+}
+
+.zalo:hover {
+    background-color: rgb(14, 108, 202); 
+}
+
+.money:hover {
+    background-color: #218838; 
+}
+

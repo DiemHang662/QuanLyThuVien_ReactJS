@@ -11,11 +11,13 @@ import SpeedIcon from '@mui/icons-material/Speed';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { MyUserContext, MyDispatchContext } from '../../configs/Contexts';
+import { useNavigate } from 'react-router-dom';
 import { authApi, endpoints } from '../../configs/API';
 import './MainLayout.css';
 
 const MainLayout = ({ children, searchTerm, setSearchTerm, onSearch }) => {
   const api = authApi();
+  const navigate = useNavigate();
   const user = useContext(MyUserContext);
   const dispatch = useContext(MyDispatchContext);
   const [categories, setCategories] = useState([]);
@@ -44,6 +46,7 @@ const MainLayout = ({ children, searchTerm, setSearchTerm, onSearch }) => {
 
   const handleLogout = () => {
     dispatch({ type: 'logout' });
+    navigate('/login');
   };
 
   return (

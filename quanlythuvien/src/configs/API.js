@@ -21,7 +21,7 @@ export const endpoints = {
 
   sach: '/api/sach/',
   sachChiTiet: (id) => `/api/sach/${id}/`,
-  sachByDanhMuc: (danhMucId) => `api/sach/by-danhmuc/?danhmuc=${danhMucId}`,
+  sachByDanhMuc: (danhMucId) => `api/sach/${danhMucId}/by-danhmuc/`,
   createSach: '/api/sach/create-sach/',
   deleteSach: (id) => `/api/sach/${id}/delete-sach/`,
   updateSach: (id) => `/api/sach/${id}/`,
@@ -47,10 +47,14 @@ export const endpoints = {
   mostLateBooks: '/api/sach/most-late-books/',
   interCount: '/api/sach/total-interactions/',
   borrowReturnCount: '/api/sach/total-borrow-return-counts/',
+  borrowReturnLateStatistics: '/api/sach/borrow-return-late-statistics/',
 
   toggle_like: (bookId) => `/api/thich/${bookId}/toggle-like/`,
   binhluan: (bookId) => `api/binhluan/?sach_id=${bookId}`,
   create_comment: (bookId) => `/api/binhluan/${bookId}/create-comment/`,
+
+  zalo: 'api/payment/zalopay/order/',
+
 };
 
 export const setAuthToken = (token) => {
@@ -95,3 +99,5 @@ export const authApi = () => {
 export default axios.create({
   baseURL: BASE_URL,
 });
+
+// AVInclKyPlwzK7Zah5IKATAOc0ewc1tItFhhYA1s6xYMywa21zxzn8PaRUHmTGdCCIoPSpAH-TNlJLfn

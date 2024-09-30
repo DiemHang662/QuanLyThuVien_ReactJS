@@ -50,7 +50,7 @@ h1{
 
 .list{
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     margin: 30px;
     flex-wrap: wrap;

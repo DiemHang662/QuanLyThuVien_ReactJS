@@ -36,6 +36,8 @@
       "react-app/jest"
     ]
   },
+  "proxy": "https://test-payment.momo.vn",
+  
   "browserslist": {
     "production": [
       ">0.2%",

@@ -1,18 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Row, Col, Alert, Button } from 'react-bootstrap';
+import React, { useContext, useEffect, useState } from 'react';
+import { Card, Row, Col, Alert, Button, Modal, Image } from 'react-bootstrap';
 import { authApi, endpoints } from '../../configs/API';
+import CryptoJS from 'crypto-js';
+import axios from 'axios';
+import { MyUserContext, MyDispatchContext } from '../../configs/Contexts';
+import { useNavigate } from 'react-router-dom';
 import MainLayout from '../../components/Navbar/MainLayout';
 import Footer from '../../components/Footer/Footer';
 import CheckIcon from '@mui/icons-material/Check';
+import PaymentIcon from '@mui/icons-material/Payment';
+import LockIcon from '@mui/icons-material/Lock';
+import LogoutIcon from '@mui/icons-material/Logout';
 import './Profile.css';
 
 const Profile = () => {
     const api = authApi();
+    const navigate = useNavigate();
+    const user = useContext(MyUserContext);
+    const dispatch = useContext(MyDispatchContext);
     const [currentUser, setCurrentUser] = useState(null);
     const [borrowedBooks, setBorrowedBooks] = useState([]);
     const [fetchError, setFetchError] = useState('');
-    const [updateSuccess, setUpdateSuccess] = useState(''); // State for showing success message
-    const [returnedBooks, setReturnedBooks] = useState(new Set()); // Track returned books
+    const [updateSuccess, setUpdateSuccess] = useState('');
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [selectedBook, setSelectedBook] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [paymentStatus, setPaymentStatus] = useState({});
 
     const fetchCurrentUser = async () => {
         try {
@@ -36,16 +50,12 @@ const Profile = () => {
 
     const returnBook = async (bookId) => {
         try {
-            const currentDate = new Date().toISOString().split('T')[0]; // Get the current date in 'YYYY-MM-DD' format
+            const currentDate = new Date().toISOString().split('T')[0];
             const data = { ngayTraThucTe: currentDate };
 
-            await api.patch(endpoints.updateChiTietPhieuMuon(bookId), data); // Update the return date
+            await api.patch(endpoints.updateChiTietPhieuMuon(bookId), data);
             setUpdateSuccess(`Đã trả sách thành công cho sách ID: ${bookId}`);
 
-            // Add the bookId to the set of returned books
-            setReturnedBooks((prev) => new Set(prev).add(bookId));
-
-            // Refresh the list of borrowed books
             if (currentUser) {
                 fetchBorrowedBooks(currentUser.id);
             }
@@ -59,11 +69,135 @@ const Profile = () => {
         fetchCurrentUser();
     }, []);
 
+    const handleThanhToanMomo = async (item) => {
+        try {
+            const api = await authApi();
+            const requestBody = createMomoRequestBody(item);
+
+            console.log('Request Body:', JSON.stringify(requestBody));
+
+            const response = await axios.post('/v2/gateway/api/create', requestBody, {
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            console.log('Momo payment response:', response.data);
+            handlePaymentResponse(response.data, item, api);
+        } catch (error) {
+            console.error('Error during Momo payment request:', error.response?.data || error.message);
+            window.alert('Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại sau!');
+        }
+    };
+
+    const createMomoRequestBody = (item) => {
+        const partnerCode = "MOMO";
+        const accessKey = "F8BBA842ECF85";
+        const secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
+        const requestId = `${partnerCode}${Date.now()}`;
+        const orderId = `MM${Date.now()}`;
+        const orderInfo = "Thanh toán hóa đơn";
+        const redirectUrl = "https://momo.vn/return";
+        const ipnUrl = "https://callback.url/notify";
+        const amount = item.tienPhat;
+        const requestType = "payWithATM";
+        const extraData = "";
+
+        const rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=${extraData}&ipnUrl=${ipnUrl}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
+        const signature = CryptoJS.HmacSHA256(rawSignature, secretKey).toString(CryptoJS.enc.Hex);
+
+        return {
+            partnerCode,
+            accessKey,
+            requestId,
+            amount,
+            orderId,
+            orderInfo,
+            redirectUrl,
+            ipnUrl,
+            extraData,
+            requestType,
+            signature,
+            lang: "vi"
+        };
+    };
+
+    const handlePaymentResponse = async (data, item, api) => {
+        if (data && data.payUrl) {
+            const payUrl = data.payUrl.trim();
+            console.log('Trimmed PayUrl:', payUrl);
+            window.open(payUrl, '_blank');
+        }
+    };
+
+    const openPaymentModal = (book) => {
+        setSelectedBook(book);
+        setShowPaymentModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowPaymentModal(false);
+        setSelectedBook(null);
+    };
+
+ const handlePaymentSuccess = (bookId) => {
+    setTimeout(() => {
+        setPaymentStatus((prevStatus) => ({
+            ...prevStatus,
+            [bookId]: true, 
+        }));
+    }, 10000); 
+};
+
+    const handleLogout = () => {
+        dispatch({ type: 'logout' });
+        navigate('/login');
+    };
+
+    const handleThanhToanZalopay = async (item) => {
+        try {
+            const response = await api.post(endpoints.zalo, {
+                amount: item.tienPhat,
+                app_user: currentUser.id // Pass the current user's ID or any other relevant info
+            });
+            if (response.data && response.data.order_url) {
+                window.open(response.data.order_url, '_blank'); // Open the ZaloPay payment page
+            } else {
+                alert('Có lỗi xảy ra khi tạo đơn hàng Zalo. Vui lòng thử lại sau!');
+            }
+        } catch (error) {
+            console.error('Error handling Zalo payment:', error);
+            alert('Có lỗi xảy ra khi tạo đơn hàng Zalo. Vui lòng thử lại sau!');
+        }
+    };
+
     return (
         <>
             <MainLayout />
             <div>
                 <h1 className="title-profile">THÔNG TIN NGƯỜI DÙNG</h1>
+
+                {currentUser && (
+                    <Row>
+                        <Col xs={7} md={4} className=" justify-content-center user-profile">
+                            {currentUser.avatar_url && (
+                                <Image src={currentUser.avatar_url} className="avatar-currentUser" />
+                            )}
+                        </Col>
+                        <Col xs={7} md={6} className="currentUser">
+                            <h2 className="hello-user"><strong>XIN CHÀO, {currentUser.first_name} {currentUser.last_name}</strong></h2>
+                            <p className="about"><strong>Mã người dùng: </strong> {currentUser.id}</p>
+                            <p className="about"><strong>Họ người dùng: </strong> {currentUser.first_name}</p>
+                            <p className="about"><strong>Tên người dùng: </strong> {currentUser.last_name}</p>
+                            <p className="about"><strong>Email: </strong> {currentUser.email}</p>
+                            <p className="about"><strong>Số điện thoại: </strong> {currentUser.phone}</p>
+                            {/* <p><strong>Số lần mượn sách: </strong> {currentUser.soLuongMuon}</p>
+                            <p><strong>Số lần trả sách: </strong> {currentUser.soLuongTra}</p>
+                            <p><strong>Số lần quá hạn mượn sách: </strong> {currentUser.soLuongQuaHan}</p> */}
+                            <Button variant="primary" className="mb-2 change-password"><LockIcon /> Đổi mật khẩu</Button>
+                            <Button variant="danger" className="mb-2" onClick={handleLogout}><LogoutIcon /> Đăng xuất</Button>
+                        </Col>
+                    </Row>
+                )}
+
                 <h2 className="history-book">LỊCH SỬ CÁC SÁCH ĐÃ MƯỢN</h2>
 
                 {fetchError && <Alert variant="danger">{fetchError}</Alert>}
@@ -82,36 +216,52 @@ const Profile = () => {
                                         <Card.Text><strong>Ngày mượn: </strong> {book.ngayMuon}</Card.Text>
                                         <Card.Text><strong>Hạn trả: </strong> {book.ngayTraDuKien}</Card.Text>
 
-                                        {book.tinhTrang === 'borrowed' || book.tinhTrang === 'late' ? (
-                                            <>
-                                                {book.tinhTrang === 'late' && (
-                                                    <p style={{ color: 'red' }}>Đã quá hạn trả sách!</p>
-                                                )}
-                                                {/* Display the "Trả sách" button if the book has not been returned */}
-                                                {!returnedBooks.has(book.id) ? ( // Check if the book has been returned
-                                                    <Button
-                                                        variant="warning"
-                                                        onClick={() => returnBook(book.id)}
-                                                    >
-                                                        Trả sách
-                                                    </Button>
-                                                ) : null}
-                                            </>
-                                        ) : (
+                                        {book.ngayTraThucTe ? (
                                             <p style={{ color: 'green' }}>
                                                 <CheckIcon /> Đã trả sách ({book.ngayTraThucTe})
                                             </p>
+                                        ) : (
+                                            <>
+                                                {book.tinhTrang === 'late' && (
+                                                    <p style={{ color: 'red' }}>Đã quá hạn mượn sách!</p>
+                                                )}
+                                                <Button
+                                                    variant="warning"
+                                                    onClick={() => returnBook(book.id)}
+                                                >
+                                                    Trả sách
+                                                </Button>
+                                            </>
                                         )}
 
-                                        {/* Show payment button after returning the book */}
-                                        {returnedBooks.has(book.id) && (
+                                        {book.ngayTraThucTe && book.tinhTrang !== 'returned' && (
                                             <>
-                                                <p><strong>Phí phạt: </strong>{book.tienPhat} VND</p>
-                                                <Button variant="success">Thanh toán tiền phạt</Button>
+                                                {book.tienPhat > 0 && (
+                                                    <>
+                                                        {paymentStatus[book.id] ? (
+                                                            <p className="text-success">
+                                                               <CheckIcon/>  Đã trả tiền phạt: {book.tienPhat} VNĐ
+                                                            </p>
+                                                        ) : (
+                                                            <>
+                                                                <strong>
+                                                                    <p className="bg-warning text-light">
+                                                                        Phí phạt: {book.tienPhat} VND
+                                                                    </p>
+                                                                </strong>
+                                                                <Button variant="success" onClick={() => {
+                                                                    openPaymentModal(book);
+                                                                    handlePaymentSuccess(book.id); // Call this after payment is successful
+                                                                }}>
+                                                                    Thanh toán tiền phạt
+                                                                </Button>
+                                                            </>
+                                                        )}
+                                                    </>
+                                                )}
                                             </>
                                         )}
                                     </Card.Body>
-
                                 </Card>
                             </Col>
                         ))
@@ -121,6 +271,33 @@ const Profile = () => {
                         </Col>
                     )}
                 </Row>
+
+                {/* Payment Modal */}
+                <Modal show={showPaymentModal} onHide={handleCloseModal}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Chọn phương thức thanh toán</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Button className="payment-button momo" onClick={() => handleThanhToanMomo(selectedBook)}>
+                            <img src="images/momo.png" alt="Momo" />
+                            Thanh toán Momo
+                        </Button>
+                        <Button className="payment-button zalo" onClick={() => handleThanhToanZalopay(selectedBook)}>
+                            <img src="images/zalopay.png" alt="Zalopay" />
+                            Thanh toán Zalopay
+                        </Button>
+                        <Button className="payment-button money" onClick={() => navigate('/profile')}>
+                            <img src="images/tienmat.png" alt="Tienmat" />
+                            Thanh toán tiền mặt
+                        </Button>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="danger" onClick={handleCloseModal}>
+                            Đóng
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+
             </div>
             <Footer />
         </>

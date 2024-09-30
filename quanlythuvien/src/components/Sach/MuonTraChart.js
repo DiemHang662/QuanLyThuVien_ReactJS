@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Line, Pie } from 'react-chartjs-2';
+import { Line, Pie } from 'react-chartjs-2'; 
 import MainLayout from '../../components/Navbar/MainLayout';
 import Footer from '../../components/Footer/Footer';
 import { authApi, endpoints } from '../../configs/API';
@@ -23,7 +23,6 @@ const MuonTraChart = () => {
     const [loading, setLoading] = useState(true);
     const [chartType, setChartType] = useState('mostBorrowed');
     const [error, setError] = useState(null);
-
     const [pieChartData, setPieChartData] = useState({
         mostReturnedBooks: { labels: [], datasets: [] },
         mostBorrowedBooks: { labels: [], datasets: [] },
@@ -77,7 +76,46 @@ const MuonTraChart = () => {
                         ],
                     });
                     return;
+                } else if (chartType === 'comparison') {
+                    response = await authApi().get(endpoints.borrowReturnLateStatistics);
+                    const data = response.data;
+    
+                    // Extracting statistics for the last 12 months
+                    const labels = data.monthly_statistics.map(stat => `${stat.month}/${stat.year}`);
+                    const borrowedCounts = data.monthly_statistics.map(stat => stat.borrowed);
+                    const returnedCounts = data.monthly_statistics.map(stat => stat.returned);
+                    const lateCounts = data.monthly_statistics.map(stat => stat.late);
+    
+                    setChartData({
+                        labels,
+                        datasets: [
+                            {
+                                label: 'Số lần mượn',
+                                data: borrowedCounts,
+                                backgroundColor: 'rgba(75,192,192,0.6)',
+                                borderColor: 'rgba(75,192,192,1)',
+                                borderWidth: 1,
+                            },
+                            {
+                                label: 'Số lần trả',
+                                data: returnedCounts,
+                                backgroundColor: 'rgba(255, 206, 86, 0.6)',
+                                borderColor: 'rgba(255, 206, 86, 1)',
+                                borderWidth: 1,
+                            },
+                            {
+                                label: 'Số lần trễ',
+                                data: lateCounts,
+                                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 1,
+                            },
+                        ],
+                    });
+                    return;
                 }
+    
+    
 
                 const data = response.data;
                 const labels = data.map(item => item.tenSach);
@@ -216,35 +254,33 @@ const MuonTraChart = () => {
                 <h6>Chọn loại thống kê: </h6>
                 <div className="select-container">
                     <select value={chartType} onChange={(e) => setChartType(e.target.value)} className="form-select1">
-                        <option value="mostBorrowed">Sách được mượn trả nhiều nhất</option>
-                        <option value="mostInteracted">Sách được tương tác nổi bật</option>
+                        <option value="mostBorrowed">Sách mượn nhiều nhất</option>
+                        <option value="mostInteracted">Sách tương tác nhiều nhất</option>
+                        <option value="comparison">So sánh số lượng mượn trả các tháng</option>
                     </select>
                 </div>
 
-                <div className="chart-wrapper">
-                    <Line data={chartData} options={options} />
+                <div className="bar-chart">
+                    <Line options={options} data={chartData} />
                 </div>
 
-                {/* Render pie charts only if the chart type is 'mostBorrowed' */}
                 {chartType === 'mostBorrowed' && (
                     <div className="pie-charts">
                         {pieLoading ? (
-                            <div className="loading">Loading Pie Charts...</div>
-                        ) : error ? (
-                            <div className="error">{error}</div>
+                            <div className="loading">Loading pie charts...</div>
                         ) : (
                             <>
                                 <div className="pie-chart">
-                                    <h3>TÌNH TRẠNG: ĐANG MƯỢN</h3>
-                                    <Pie data={pieChartData.mostBorrowedBooks} options={pieOptions} />
+                                    <h4>Sách trả nhiều nhất</h4>
+                                    <Pie options={pieOptions} data={pieChartData.mostReturnedBooks} />
                                 </div>
                                 <div className="pie-chart">
-                                    <h3>TÌNH TRẠNG: ĐÃ TRẢ SÁCH</h3>
-                                    <Pie data={pieChartData.mostReturnedBooks} options={pieOptions} />
+                                    <h4>Sách mượn nhiều nhất</h4>
+                                    <Pie options={pieOptions} data={pieChartData.mostBorrowedBooks} />
                                 </div>
                                 <div className="pie-chart">
-                                    <h3>TÌNH TRẠNG: QUÁ HẠN MƯỢN</h3>
-                                    <Pie data={pieChartData.mostLateBooks} options={pieOptions} />
+                                    <h4>Sách trễ hạn nhiều nhất</h4>
+                                    <Pie options={pieOptions} data={pieChartData.mostLateBooks} />
                                 </div>
                             </>
                         )}
