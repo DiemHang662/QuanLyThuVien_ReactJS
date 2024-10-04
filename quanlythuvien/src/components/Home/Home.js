@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Carousel, Button, Form, ListGroup, Dropdown } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import Footer from '../../components/Footer/Footer';
 import AddIcon from '@mui/icons-material/Add';
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
@@ -21,7 +21,6 @@ const Home = () => {
 
   const api = authApi();
   const navigate = useNavigate();
-
   const [books, setBooks] = useState([]);
   const [allBooks, setAllBooks] = useState([]);
   const [likedBooks, setLikedBooks] = useState(new Set());
@@ -46,7 +45,7 @@ const Home = () => {
 
     const fetchCategories = async () => {
       try {
-        const response = await api.get(endpoints.danhmuc); // Adjust this endpoint if necessary
+        const response = await api.get(endpoints.danhmuc);
         setCategories(response.data);
       } catch (error) {
         console.error('Lỗi khi gọi API danh mục:', error);
@@ -150,95 +149,117 @@ const Home = () => {
   return (
     <div className="body-home">
       <div className="container-home">
-        <MainLayout onCategoryChange={handleCategoryChange} searchTerm={searchTerm} setSearchTerm={setSearchTerm} onSearch={handleSearch} />
+        <MainLayout
+          onCategoryChange={handleCategoryChange}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          onSearch={handleSearch}
+        />
         <div className="content-wrapper">
-          <Carousel className="carousel">
-            {images.map((image, index) => (
-              <Carousel.Item key={index}>
-                <img className="d-block img-carousel" src={image} alt={`slide-${index}`} />
-              </Carousel.Item>
-            ))}
-          </Carousel>
+          <div className="sidebar">
+            <h4 className="title-sidebar">Thể loại</h4>
+            <ListGroup>
+              {categories.map((category) => (
+                <ListGroup.Item
+                  key={category.id}
+                  onClick={() => handleCategoryChange(category.id)}
+                  className="list-group-item" // Ensure this class is applied
+                >
+                  {category.tenDanhMuc}
+                </ListGroup.Item>
+              ))}
+              {/* <ListGroup.Item onClick={() =>  navigate('/dssach')} className="list-group-item" >
+                Tất cả sách
+              </ListGroup.Item> */}
 
-          <h1>GIỚI THIỆU</h1>
-          <div className="intro"></div>
-
-          <div className="category-filter">
-            <Dropdown>
-              <Dropdown.Toggle variant="light" id="dropdown-basic">
-                {selectedCategory ? `Danh mục: ${categories.find(cat => cat.id === selectedCategory)?.tenDanhMuc}` : 'Chọn danh mục'}
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item onClick={() => handleCategoryChange(null)}>Tất cả sách</Dropdown.Item>
-                {categories.map((category) => (
-                  <Dropdown.Item key={category.id} onClick={() => handleCategoryChange(category.id)}>
-                    {category.tenDanhMuc}
-                  </Dropdown.Item>
-                ))}
-              </Dropdown.Menu>
-            </Dropdown>
+            </ListGroup>
           </div>
 
 
-          <div className="list">
-            {books.length > 0 ? (
-              books.map((book) => (
-                <div key={book.id} className={`book-item ${expandedBooks.has(book.id) ? 'expanded' : ''}`}>
-                  <img src={book.anhSach_url} className="book-image" alt="Book" />
-                  <h3>{book.tenSach}</h3>
-                  <h4><strong>Tác giả: </strong> {book.tenTacGia}</h4>
-                  <Button className="add"  onClick={() => navigate(`/sach/${book.id}`)} >
-                    <AddIcon /> Mượn sách
-                  </Button>
-                  <div className="action-buttons mt-3">
-                    <Button variant="link" className="action-btn" onClick={() => handleLike(book.id)} style={{ color: getButtonColor(book.id) }}>
-                      {isBookLiked(book.id) ? <ThumbUpIcon className="action-icon" /> : <ThumbUpOffAltIcon className="action-icon" />}
-                      Thích
+          {/* Book List Component */}
+          <div className="book-list">
+            <Carousel className="carousel">
+              {images.map((image, index) => (
+                <Carousel.Item key={index}>
+                  <img className="d-block img-carousel" src={image} alt={`slide-${index}`} />
+                </Carousel.Item>
+              ))}
+            </Carousel>
+
+            <h1>GIỚI THIỆU</h1>
+            <div className="intro"></div>
+
+            {/* <div className="category-filter">
+              <Dropdown>
+                <Dropdown.Toggle variant="light" id="dropdown-basic">
+                  {selectedCategory ? `Danh mục: ${categories.find(cat => cat.id === selectedCategory)?.tenDanhMuc}` : 'Chọn danh mục'}
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item onClick={() => handleCategoryChange(null)}>Tất cả sách</Dropdown.Item>
+                  {categories.map((category) => (
+                    <Dropdown.Item key={category.id} onClick={() => handleCategoryChange(category.id)}>
+                      {category.tenDanhMuc}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
+            </div> */}
+
+            <div className="list">
+              {books.length > 0 ? (
+                books.map((book) => (
+                  <div key={book.id} className={`book-item ${expandedBooks.has(book.id) ? 'expanded' : ''}`}>
+                    <img src={book.anhSach_url} className="book-image" alt="Book" />
+                    <h3>{book.tenSach}</h3>
+                    <h4><strong>Tác giả: </strong> {book.tenTacGia}</h4>
+                    <Button className="add" onClick={() => navigate(`/sach/${book.id}`)} >
+                      <AddIcon /> Mượn sách
                     </Button>
-                    <Button variant="link" className="action-btn" onClick={() => toggleComments(book.id)}>
-                      <CommentIcon className="action-icon" /> Bình luận
-                    </Button>
-                    <Button variant="link" className="action-btn"><ShareIcon className="action-icon" /> Chia sẻ</Button>
-                  </div>
-                  {visibleComments[book.id] && (
-                    <div className="comment-section">
-                      <ListGroup>
-                        {Array.isArray(comments[book.id]) && comments[book.id].length > 0 ? (
-                          comments[book.id].map((comment) => (
-                            <ListGroup.Item key={comment.id}>
-                              <img src={comment.user.avatar_url} alt="Avatar" className="img-avatar rounded-circle" />
-                              <strong>{comment.user.first_name} {comment.user.last_name}:</strong> {comment.content}
-                            </ListGroup.Item>
-                          ))
-                        ) : (
-                          <p>Chưa có bình luận nào.</p>
-                        )}
-                      </ListGroup>
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <Form.Control
-                          as="textarea"
-                          rows={1}
-                          value={commentInput[book.id] || ''}
-                          onChange={(e) => handleCommentChange(book.id, e.target.value)}
-                          placeholder="Viết bình luận..."
-                          style={{ marginLeft: '5px', marginTop: '5px', borderRadius: '15px', flexGrow: 1, fontSize: '12px' }}
-                        />
-                        <Button variant="link" className="bt-comment" onClick={() => handleCommentSubmit(book.id)}>
-                          <SendIcon />
-                        </Button>
-                      </div>
+                    <div className="action-buttons mt-3">
+                      <Button variant="link" className="action-btn" onClick={() => handleLike(book.id)} style={{ color: getButtonColor(book.id) }}>
+                        {isBookLiked(book.id) ? <ThumbUpIcon className="action-icon" /> : <ThumbUpOffAltIcon className="action-icon" />}
+                        Thích
+                      </Button>
+                      <Button variant="link" className="action-btn" onClick={() => toggleComments(book.id)}>
+                        <CommentIcon className="action-icon" /> Bình luận
+                      </Button>
+                      <Button variant="link" className="action-btn"><ShareIcon className="action-icon" /> Chia sẻ</Button>
                     </div>
-                  )}
-                </div>
-              ))
-            ) : (
-              <p>Không có sách để hiển thị.</p>
-            )}
+                    {visibleComments[book.id] && (
+                      <div className="comment-section">
+                        <ListGroup>
+                          {Array.isArray(comments[book.id]) && comments[book.id].length > 0 ? (
+                            comments[book.id].map((comment) => (
+                              <ListGroup.Item key={comment.id}>
+                                <img src={comment.user.avatar_url} alt="Avatar" className="avatar" />
+                                <span className="cmt">{comment.content}</span>
+                              </ListGroup.Item>
+                            ))
+                          ) : (
+                            <ListGroup.Item className="text-center">Chưa có bình luận nào.</ListGroup.Item>
+                          )}
+                        </ListGroup>
+                        <Form onSubmit={(e) => { e.preventDefault(); handleCommentSubmit(book.id); }}>
+                          <Form.Control
+                            type="text"
+                            placeholder="Nhập bình luận..."
+                            value={commentInput[book.id] || ''}
+                            onChange={(e) => handleCommentChange(book.id, e.target.value)}
+                          />
+                          <Button type="submit" className="mt-2"><SendIcon /> Gửi</Button>
+                        </Form>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p>Không có sách nào.</p>
+              )}
+            </div>
           </div>
-
-          <Footer />
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

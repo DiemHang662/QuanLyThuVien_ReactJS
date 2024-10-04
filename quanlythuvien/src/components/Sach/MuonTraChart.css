@@ -15,7 +15,29 @@ h1 {
 .select-container {
     text-align: center; 
     margin-bottom: 20px; 
+    width: 100% !important;
+    height: 50px !important;
+    border-radius: 20px !important;
+    display: flex;             
+    justify-content: center;    
 }
+
+.select-container select {
+    width: 50%;                 
+    height: 100%;                
+    border-radius: 20px;       
+    border: 1px solid #ccc;     
+    padding: 10px;             
+    font-size: 16px;            
+    background-color: #f9f9f9;  
+    transition: border-color 0.3s;
+}
+
+.select-container select:focus {
+    border-color: #007bff;     
+    outline: none;             
+}
+
 
 h3{
     font-size: 17px;
@@ -69,10 +91,11 @@ h6{
 }
 
 .pie-chart {
-    flex: 1 1 250px; 
-    margin: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
-    padding: 5px; 
-    background: #fff; 
+    flex: 1 1 250px;             /* Flexible items */
+    width: 30%;              /* Ensure maximum width is 30% */
+    margin: 10px;                /* Space between charts */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow effect */
+    padding: 5px;                /* Inner padding */
+    background: #fff;            /* Background color */
 }
 

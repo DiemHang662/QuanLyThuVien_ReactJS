@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col } from 'react-bootstrap';
-import { Pie } from 'react-chartjs-2'; // Changed from Line to Pie
+import { Row, Col, Table } from 'react-bootstrap'; // Import Table from react-bootstrap
+import { Pie } from 'react-chartjs-2'; 
 import { useNavigate } from 'react-router-dom';
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import GroupIcon from '@mui/icons-material/Group';
@@ -9,11 +9,10 @@ import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import { authApi, endpoints } from '../../configs/API';
 import './TongQuan.css';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'; // Updated imports
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'; 
 import Footer from '../../components/Footer/Footer';
 import MainLayout from '../Navbar/MainLayout';
 
-// Registering the necessary components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const TongQuan = () => {
@@ -38,7 +37,6 @@ const TongQuan = () => {
 
                 const borrowReturnResponse = await api.get(endpoints.borrowReturnCount);
                 setBorrowReturnCount(borrowReturnResponse.data.total_borrow_count);
-
             } catch (error) {
                 console.error('Error fetching counts:', error);
             }
@@ -47,7 +45,6 @@ const TongQuan = () => {
         fetchCounts();
     }, []);
 
-    // Define colors to match the info boxes
     const colors = ['#4CAF50', '#2196F3', '#FFC107', '#F44336'];
 
     const chartData = {
@@ -75,9 +72,19 @@ const TongQuan = () => {
         },
     };
 
+    // Calculate percentages
+    const total = userCount + bookCount + borrowReturnCount + interCount;
+    const percentages = [
+        ((userCount / total) * 100).toFixed(2) || 0,
+        ((bookCount / total) * 100).toFixed(2) || 0,
+        ((borrowReturnCount / total) * 100).toFixed(2) || 0,
+        ((interCount / total) * 100).toFixed(2) || 0,
+    ];
+
     return (
-        <div className="body-home">
-            <MainLayout>
+        <>
+            <MainLayout />
+            <div className="body-home">
                 <div className="tong-quan-content">
                     <Row className="card-container">
                         <h1 className="h1">TỔNG QUAN THƯ VIỆN</h1>
@@ -142,14 +149,52 @@ const TongQuan = () => {
                         </Col>
                     </Row>
 
-                    <div className="chart">
-                        <Pie data={chartData} options={chartOptions} /> 
-                    </div>
+                    <Row>
+                        <Col md={6}>
+                            <div className="chart">
+                                <Pie data={chartData} options={chartOptions} />
+                            </div>
+                        </Col>
+                        <Col md={6} className="nhanxet">
+                            <h3 className="title-nhanxet">Thông tin nhận xét</h3>
+                            <Table striped bordered hover>
+                                <thead>
+                                    <tr>
+                                        <th>Danh mục</th>
+                                        <th>Số lượng</th>
+                                        <th>Tỷ lệ (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Người dùng</td>
+                                        <td>{userCount}</td>
+                                        <td>{percentages[0]}%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sách</td>
+                                        <td>{bookCount}</td>
+                                        <td>{percentages[1]}%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mượn trả</td>
+                                        <td>{borrowReturnCount}</td>
+                                        <td>{percentages[2]}%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Lượt tương tác</td>
+                                        <td>{interCount}</td>
+                                        <td>{percentages[3]}%</td>
+                                    </tr>
+                                </tbody>
+                            </Table>
+                        </Col>
+                    </Row>
 
                     <Footer />
                 </div>
-            </MainLayout>
-        </div>
+            </div>
+        </>
     );
 };
 

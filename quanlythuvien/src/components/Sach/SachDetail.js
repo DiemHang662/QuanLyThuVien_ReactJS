@@ -19,6 +19,7 @@ const SachDetail = () => {
     const [selectedLoanSlipId, setSelectedLoanSlipId] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [selectedLoanSlip, setSelectedLoanSlip] = useState(null);
+    const [relatedBooks, setRelatedBooks] = useState([]);
 
     useEffect(() => {
         const fetchBookDetails = async () => {
@@ -53,6 +54,19 @@ const SachDetail = () => {
             }
         };
         fetchLoanSlips();
+    }, []);
+
+    useEffect(() => {
+        const fetchRelatedBooks = async () => {
+            try {
+                const response = await authApi().get(endpoints.sach); // Corrected
+                setRelatedBooks(response.data);
+            } catch (error) {
+                console.error('Error fetching related books:', error);
+            }
+        };
+    
+        fetchRelatedBooks();
     }, []);
 
     // Load borrowing status from local storage
@@ -117,6 +131,7 @@ const SachDetail = () => {
         return <p>Loading...</p>;
     }
 
+
     return (
         <>
             <MainLayout />
@@ -141,6 +156,25 @@ const SachDetail = () => {
                     ) : (
                         <Button className="add-to-cart" onClick={handleOpenModal}>Mượn sách</Button>
                     )}
+                </div>
+            </div>
+
+            <div className="related-books-section">
+                <h2 className="title-related">MỘT SỐ SÁCH KHÁC CHO BẠN</h2>
+                <div className="related-books-list">
+                    {relatedBooks.slice(0, 12).map((relatedBook) => (
+                        <div key={relatedBook.id} className="related-book-item">
+                            <img src={relatedBook.anhSach_url} alt={relatedBook.tenSach} className="related-book-image" />
+                            <p className="related-book-title">{relatedBook.tenSach}</p>
+                            <p className="related-book-tacgia"><strong>Tác giả:</strong> {relatedBook.tenTacGia}</p>
+                            <Button
+                                variant="warning" className="detail-book"
+                                onClick={() => navigate(`/sach/${relatedBook.id}`)}
+                            >
+                                Xem chi tiết
+                            </Button>
+                        </div>
+                    ))}
                 </div>
             </div>
 

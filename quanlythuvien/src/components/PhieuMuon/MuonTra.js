@@ -240,8 +240,7 @@ const MuonTra = () => {
                 </tbody>
             </Table>
 
-            {/* Modal for Editing Loan Slip Details or Viewing Borrowed Books */}
-            <Modal show={showModal} onHide={() => setShowModal(false)}>
+            <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
                 <Modal.Header closeButton>
                     <Modal.Title>{selectedChiTiet ? 'Chỉnh sửa chi tiết phiếu mượn' : 'Sách đã mượn'}</Modal.Title>
                 </Modal.Header>
@@ -281,8 +280,20 @@ const MuonTra = () => {
                             <Button type="submit" variant="primary">Cập nhật</Button>
                         </Form>
                     ) : (
+
                         <Table bordered>
                             <thead>
+                                {borrowedBooks.length > 0 && (
+                                    <>
+                                        <tr>
+                                            <td colSpan="6" className="info-table">
+                                                <p><strong>Mã người dùng:</strong> {borrowedBooks[0].id}</p>
+                                                <p><strong>Họ và tên:</strong> {borrowedBooks[0].first_name} {borrowedBooks[0].last_name}</p>
+                                                <p><strong>Số điện thoại:</strong> {borrowedBooks[0].phone}</p>
+                                            </td>
+                                        </tr>
+                                    </>
+                                )}
                                 <tr>
                                     <th>Mã Sách</th>
                                     <th>Tên Sách</th>
@@ -298,9 +309,17 @@ const MuonTra = () => {
                                         <tr key={book.sach_id}>
                                             <td>{book.sach_id}</td>
                                             <td>{book.tenSach}</td>
-                                            <td>{book.tinhTrang}</td>
-                                            <td>{book.ngayMuon}</td>
-                                            <td>{book.ngayTraThucTe}</td>
+                                            <td>
+                                                {book.tinhTrang === 'returned' ? (
+                                                    <CheckIcon style={{ color: 'green' }} />
+                                                ) : book.tinhTrang === 'late' ? (
+                                                    <span style={{ color: 'red' }}>Quá hạn trả</span>
+                                                ) : (
+                                                    <span style={{ color: 'dodgerblue' }}>Đang mượn</span>
+                                                )}
+                                            </td>
+                                            <td>{new Date(book.ngayMuon).toLocaleDateString()}</td>
+                                            <td>{book.ngayTraThucTe ? new Date(book.ngayTraThucTe).toLocaleDateString() : 'Chưa trả'}</td>
                                             <td>{book.tienPhat}</td>
                                         </tr>
                                     ))
@@ -311,10 +330,11 @@ const MuonTra = () => {
                                 )}
                             </tbody>
                         </Table>
+
                     )}
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>Đóng</Button>
+                    <Button variant="danger" onClick={() => setShowModal(false)}>Đóng</Button>
                 </Modal.Footer>
             </Modal>
 

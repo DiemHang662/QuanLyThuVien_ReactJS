@@ -8,12 +8,14 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import './PhieuMuonList.css'; 
+
 const PhieuMuonList = () => {
     const api = authApi();
     const navigate = useNavigate();
 
     const [phieuMuons, setPhieuMuons] = useState([]); 
     const [docGias, setDocGias] = useState([]); 
+    const [sachs, setSachs] = useState([]); // State for books
     const [searchTerm, setSearchTerm] = useState('');
     const [editPhieuMuon, setEditPhieuMuon] = useState(null); 
     const [showEditModal, setShowEditModal] = useState(false); 
@@ -23,7 +25,7 @@ const PhieuMuonList = () => {
         const fetchPhieuMuons = async () => {
             try {
                 const response = await api.get(endpoints.phieuMuon);
-                console.log(response.data); // Add this line to inspect the response
+                console.log(response.data); // Inspect the response
                 setPhieuMuons(response.data);
             } catch (error) {
                 console.error('Error fetching loan slips:', error.response?.data || error.message);
@@ -50,8 +52,6 @@ const PhieuMuonList = () => {
 
         fetchDocGias();
     }, []);
-
-    
 
     const handleDelete = async (id) => {
         if (window.confirm('Bạn có chắc chắn muốn xóa phiếu mượn này không?')) {
@@ -145,7 +145,7 @@ const PhieuMuonList = () => {
                         </tr>
                     </thead>
                     <tbody>
-                    {filteredPhieuMuons.length > 0 ? (
+                        {filteredPhieuMuons.length > 0 ? (
                             filteredPhieuMuons.map(phieuMuon => (
                                 <tr key={phieuMuon.id}>
                                     <td>{phieuMuon.first_name} {phieuMuon.last_name}</td>
@@ -233,14 +233,13 @@ const PhieuMuonList = () => {
                                     {errors.ngayTraDuKien && errors.ngayTraDuKien.join(', ')}
                                 </Form.Control.Feedback>
                             </Form.Group>
-                            <Button type="submit" variant="primary">
-                                {editPhieuMuon?.id ? 'Lưu thay đổi' : 'Thêm phiếu mượn'}
+                            <Button variant="primary" type="submit">
+                                {editPhieuMuon?.id ? 'Cập nhật' : 'Thêm'}
                             </Button>
                         </Form>
                     </Modal.Body>
                 </Modal>
             </div>
-
             <Footer />
         </>
     );

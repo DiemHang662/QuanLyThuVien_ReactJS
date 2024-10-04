@@ -11,9 +11,11 @@ import SachDetail from './components/Sach/SachDetail';
 import MuonTraChart from './components/Sach/MuonTraChart';
 import PhieuMuonList from './components/PhieuMuon/PhieuMuonList';
 import MuonTra from './components/PhieuMuon/MuonTra';
+import TinTuc from './components/TinTuc/TinTuc';
 import './App.css';
 import { MyUserContext } from './configs/Contexts';
 import MainLayout from './components/Navbar/MainLayout';
+import ChatBot from "./ChatBot";
 
 function App() {
   const user = useContext(MyUserContext);
@@ -25,9 +27,9 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/tongquan" element={user ? <TongQuan /> : <Navigate to="/login" />} />
           <Route path="/nguoidung" element={user ? <NguoiDungList /> : <Navigate to="/login" />} />
-          <Route path="/dangki" element={user ? <Register /> : <Navigate to="/login" />} />
+          <Route path="/dangki" element={<Register />} />
           <Route path="/danhmuc" element={user ? <MainLayout /> : <Navigate to="/login" />} />
-          <Route path="/sach" element={user ? <Home /> : <Navigate to="/login" />} />
+          <Route path="/sach" element={<Home /> } />
           <Route path="/sach/:id" element={user ? <SachDetail /> : <Navigate to="/login" />} />
           <Route path="/dssach" element={user ? <SachList /> : <Navigate to="/login" />} />
           <Route path="/bctk" element={user ? <MuonTraChart /> : <Navigate to="/login" />} />
@@ -35,9 +37,12 @@ function App() {
           <Route path="/muontra" element={user ? <MuonTra /> : <Navigate to="/login" />} />
           <Route path="/login" element={<Login />} /> 
           <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
+          <Route path="/tintuc" element={<TinTuc />} />
         </Routes>
       </div>
+      <ChatBot />
     </Router>
+    
   );
 }
 

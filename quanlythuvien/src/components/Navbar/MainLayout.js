@@ -9,7 +9,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import SpeedIcon from '@mui/icons-material/Speed';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import NewspaperIcon from '@mui/icons-material/Newspaper';
 import { MyUserContext, MyDispatchContext } from '../../configs/Contexts';
 import { useNavigate } from 'react-router-dom';
 import { authApi, endpoints } from '../../configs/API';
@@ -97,7 +97,7 @@ const MainLayout = ({ children, searchTerm, setSearchTerm, onSearch }) => {
                   <Nav.Link as={Link} to="/tongquan"><SpeedIcon /> Tổng quan</Nav.Link>
                 )}
                 <Nav.Link as={Link} to="/" className="me-3"><HomeIcon /> Trang chủ</Nav.Link>
-                <Nav.Link as={Link} to="/chat" className="me-3"><ChatIcon /> Chat</Nav.Link>
+                <Nav.Link as={Link} to="/tintuc" className="me-3"><NewspaperIcon/> Tin tức</Nav.Link>
                 <Dropdown>
                   <Dropdown.Toggle variant="light" id="dropdown-basic">Khác</Dropdown.Toggle>
                   <Dropdown.Menu>
@@ -130,10 +130,7 @@ const MainLayout = ({ children, searchTerm, setSearchTerm, onSearch }) => {
                   <AccountCircleIcon />
                 </Button>
               ) : (
-                <>
-                  <Nav.Link as={Link} to="/profile" className="d-flex flex-column align-items-center ms-4">
-                    <LibraryAddIcon />
-                  </Nav.Link>
+                <>            
                   <Dropdown align="end" className="ms-3">
                     <Dropdown.Toggle variant="light" className="d-flex align-items-center">
                       <img src={user.avatar_url} alt="Avatar" className="img-avatar rounded-circle" />

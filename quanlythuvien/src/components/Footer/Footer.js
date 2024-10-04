@@ -6,8 +6,11 @@ import TwitterIcon from '@mui/icons-material/Twitter';
 import GoogleIcon from '@mui/icons-material/Google';
 import { MDBFooter, MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import './Footer.css'; // Ensure you create this CSS file for custom styles
+import { useNavigate} from 'react-router-dom';
 
 const Footer = () => {
+  const navigate = useNavigate();
+
   return (
     <MDBFooter className='text-white text-center bg-dark'>
       <MDBContainer className='p-3'>
@@ -26,9 +29,9 @@ const Footer = () => {
           <MDBCol md='2' className='mb-4'>
             <h5 className='text-uppercase mb-4 font-weight-bold'>Liên Kết</h5>
             <ul className='list-unstyled'>
-              <li><a href='#' className='text-white mb-2'>Trang chủ</a></li>
-              <li><a href='#' className='text-white mb-2'>Giới thiệu</a></li>
-              <li><a href='#' className='text-white mb-2'>Dịch vụ</a></li>
+              <li onClick={()=> navigate('/')}>Trang chủ</li>
+              <li onClick={()=> navigate('/tongquan')}>Tổng quan</li>
+              <li onClick={()=> navigate('/tintuc')} className='text-white mb-2'>Tin tức</li>
               <li><a href='#' className='text-white mb-2'>Liên hệ</a></li>
             </ul>
           </MDBCol>

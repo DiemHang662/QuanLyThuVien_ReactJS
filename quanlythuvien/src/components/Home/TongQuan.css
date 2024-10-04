@@ -31,9 +31,9 @@
 
 .info-box {
     width: 100%;
-    max-width: 250px; /* Set a max width for responsiveness */
+    max-width: 250px; 
     height: 150px;
-    margin: 10px;
+    margin: 15px;
     font-weight: bold;
     color: rgb(79, 76, 76);
     position: relative;
@@ -46,7 +46,7 @@
 }
 
 .info-box:hover {
-    transform: scale(1.05); /* Add hover effect */
+    transform: scale(1.05);
 }
 
 .info-header {
@@ -74,7 +74,7 @@
     font-weight: 400;
     cursor: pointer;
     text-align: center;
-    background: rgba(255, 255, 255, 0.2); /* Slight background for visibility */
+    background: rgba(255, 255, 255, 0.2); 
 }
 
 .user {
@@ -112,9 +112,23 @@
 
 .chart {
     margin: 20px auto;
-    width: 93%;
+    width: 90%;
     height: 400px;
     background: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.title-nhanxet{
+    color:#4CAF50;
+    font-weight: bold;
+    font-size: 20px;
+    text-transform: uppercase;
     padding: 10px;
+}
+
+.nhanxet{
+    margin: 20px auto;
+    background-color: white;
+    width: 45%;
+    height: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
