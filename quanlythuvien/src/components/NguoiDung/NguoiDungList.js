@@ -175,7 +175,7 @@ const NguoiDungList = () => {
                                 <td>{user.username}</td>
                                 <td>{user.phone || 'Chưa cập nhật'}</td>
                                 <td>{user.email}</td>
-                                <td>{user.is_superuser ? 'Quản trị viên' : 'Độc giả'}</td>
+                                <td>{user.is_superuser ? 'Nhân viên' : 'Độc giả'}</td>
                                 <td className="action-buttons">
                                     <Button
                                         variant="primary"

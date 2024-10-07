@@ -38,7 +38,6 @@ h1 {
     outline: none;             
 }
 
-
 h3{
     font-size: 17px;
 }
@@ -68,9 +67,6 @@ h6{
     opacity: 0.6;
 }
 
-.chart-wrapper {
-    margin: auto 50px;
-}
 
 .loading, .error {
     text-align: center; 
@@ -86,16 +82,23 @@ h6{
 .pie-charts {
     display: flex;
     justify-content: space-between; 
-    flex-wrap: wrap;
+    flex-wrap:nowrap;
     margin-bottom: 30px;
 }
 
 .pie-chart {
-    flex: 1 1 250px;             /* Flexible items */
-    width: 30%;              /* Ensure maximum width is 30% */
-    margin: 10px;                /* Space between charts */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow effect */
-    padding: 5px;                /* Inner padding */
-    background: #fff;            /* Background color */
+    flex: 1 1 250px;             
+    width: 100%;            
+    margin: 10px;              
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+    padding: 5px;              
+    background: #fff;          
+}
+
+.chart{
+    width: 80%;
+    height: 500px;
+    margin: 0 70px;
+    padding: 10px;
 }
 

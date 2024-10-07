@@ -58,7 +58,7 @@ const MuonTraChart = () => {
                             {
                                 label: 'Số lượt thích',
                                 data: likeCounts,
-                                backgroundColor: 'rgb(255, 181, 197, 0.3)',
+                                backgroundColor: 'rgb(255, 181, 197, 0.4)',
                                 borderColor: 'rgb(255, 181, 197, 1)',
                                 borderWidth: 2,
                                 fill: true,
@@ -67,7 +67,7 @@ const MuonTraChart = () => {
                             {
                                 label: 'Số bình luận',
                                 data: commentCounts,
-                                backgroundColor: 'rgb(176, 226, 255, 0.3)',
+                                backgroundColor: 'rgb(176, 226, 255, 0.4)',
                                 borderColor: 'rgb(176, 226, 255, 1)',
                                 borderWidth: 2,
                                 fill: true,
@@ -80,7 +80,6 @@ const MuonTraChart = () => {
                     response = await authApi().get(endpoints.borrowReturnLateStatistics);
                     const data = response?.data || {};
 
-                    // Extracting statistics for the last 12 months
                     const labels = data.monthly_statistics?.map(stat => `${stat.month}/${stat.year}`) || [];
                     const borrowedCounts = data.monthly_statistics?.map(stat => stat.borrowed) || [];
                     const returnedCounts = data.monthly_statistics?.map(stat => stat.returned) || [];
@@ -141,10 +140,14 @@ const MuonTraChart = () => {
             }
         };
 
+        const calculatePercentage = (data) => {
+            const total = data.reduce((sum, count) => sum + count, 0);
+            return data.map(count => (total > 0 ? ((count / total) * 100).toFixed(2) : 0));
+        };
+
         const fetchPieChartData = async () => {
             setPieLoading(true);
             try {
-                // Only fetch data if the chartType is 'mostStatus'
                 if (chartType === 'mostStatus') {
                     const [mostReturnedResponse, mostBorrowedResponse, mostLateResponse] = await Promise.all([
                         authApi().get(endpoints.mostReturnedBooks),
@@ -190,6 +193,27 @@ const MuonTraChart = () => {
                             }],
                         },
                     });
+
+                    // Tính tỷ lệ phần trăm cho từng loại sách
+                    const returnedPercentages = calculatePercentage(returnedCounts);
+                    const borrowedPercentages = calculatePercentage(borrowedCounts);
+                    const latePercentages = calculatePercentage(lateCounts);
+
+                    setPieChartData(prevData => ({
+                        ...prevData,
+                        mostReturnedBooks: {
+                            ...prevData.mostReturnedBooks,
+                            percentages: returnedPercentages,
+                        },
+                        mostBorrowedBooks: {
+                            ...prevData.mostBorrowedBooks,
+                            percentages: borrowedPercentages,
+                        },
+                        mostLateBooks: {
+                            ...prevData.mostLateBooks,
+                            percentages: latePercentages,
+                        },
+                    }));
                 }
             } catch (error) {
                 console.error('Error fetching pie chart data:', error.response?.data || error.message);
@@ -274,17 +298,71 @@ const MuonTraChart = () => {
                             <div className="loading">Loading pie chart...</div>
                         ) : (
                             <>
-                                <div class="pie-chart">
+                                <div className="pie-chart">
                                     <h2>Biểu đồ số lượng sách được trả</h2>
                                     <Pie options={pieOptions} data={pieChartData.mostReturnedBooks} />
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Tên sách</th>
+                                                <th>Số lượng</th>
+                                                <th>%</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {pieChartData.mostReturnedBooks.labels.map((label, index) => (
+                                                <tr key={index}>
+                                                    <td>{label}</td>
+                                                    <td>{pieChartData.mostReturnedBooks.datasets[0].data[index]}</td>
+                                                    <td>{pieChartData.mostReturnedBooks.percentages[index]}%</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
-                                <div class="pie-chart">
+                                <div className="pie-chart">
                                     <h2>Biểu đồ số lượng sách được mượn</h2>
                                     <Pie options={pieOptions} data={pieChartData.mostBorrowedBooks} />
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Tên sách</th>
+                                                <th>Số lượng</th>
+                                                <th>%</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {pieChartData.mostBorrowedBooks.labels.map((label, index) => (
+                                                <tr key={index}>
+                                                    <td>{label}</td>
+                                                    <td>{pieChartData.mostBorrowedBooks.datasets[0].data[index]}</td>
+                                                    <td>{pieChartData.mostBorrowedBooks.percentages[index]}%</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
-                                <div class="pie-chart">
+                                <div className="pie-chart">
                                     <h2>Biểu đồ số lượng sách bị trễ</h2>
                                     <Pie options={pieOptions} data={pieChartData.mostLateBooks} />
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Tên sách</th>
+                                                <th>Số lượng</th>
+                                                <th>%</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {pieChartData.mostLateBooks.labels.map((label, index) => (
+                                                <tr key={index}>
+                                                    <td>{label}</td>
+                                                    <td>{pieChartData.mostLateBooks.datasets[0].data[index]}</td>
+                                                    <td>{pieChartData.mostLateBooks.percentages[index]}%</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </>
                         )}

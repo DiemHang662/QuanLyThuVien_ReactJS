@@ -47,6 +47,10 @@
   color: #4CAF50 !important;
 }
 
+.navbar-custom .nav-link{
+  margin: 0 7px; 
+}
+
 .navbar-custom .nav-link:hover {
   background-color: #4CAF50; 
   color: white; 
@@ -95,4 +99,8 @@
   border-radius: 50%;
   width: 40px;
   height: 40px;
+}
+
+.brand{
+  color: rgb(8, 8, 74);
 }

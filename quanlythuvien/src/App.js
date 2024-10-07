@@ -10,6 +10,7 @@ import SachList from './components/Sach/SachList';
 import SachDetail from './components/Sach/SachDetail';
 import MuonTraChart from './components/Sach/MuonTraChart';
 import PhieuMuonList from './components/PhieuMuon/PhieuMuonList';
+import PhieuMuon from './components/PhieuMuon/PhieuMuon';
 import MuonTra from './components/PhieuMuon/MuonTra';
 import TinTuc from './components/TinTuc/TinTuc';
 import './App.css';
@@ -34,6 +35,7 @@ function App() {
           <Route path="/dssach" element={user ? <SachList /> : <Navigate to="/login" />} />
           <Route path="/bctk" element={user ? <MuonTraChart /> : <Navigate to="/login" />} />
           <Route path="/phieumuon" element={user ? <PhieuMuonList /> : <Navigate to="/login" />} />
+          <Route path="/dkiphieumuon" element={user ? <PhieuMuon /> : <Navigate to="/login" />} />
           <Route path="/muontra" element={user ? <MuonTra /> : <Navigate to="/login" />} />
           <Route path="/login" element={<Login />} /> 
           <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />

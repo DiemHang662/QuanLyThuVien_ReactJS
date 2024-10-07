@@ -165,12 +165,7 @@ const Register = () => {
                             checked={is_staff}
                             onChange={() => setIsStaff(!is_staff)}
                         />
-                        <Form.Check
-                            type="checkbox"
-                            label="Nhân viên"
-                            checked={is_superuser}
-                            onChange={() => setIsSuperuser(!is_superuser)}
-                        />
+                
                     </Form.Group>
                     <Button className="submit" type="submit" variant="primary">
                         ĐĂNG KÝ

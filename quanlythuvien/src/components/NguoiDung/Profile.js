@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Card, Row, Col, Alert, Button, Modal, Image } from 'react-bootstrap';
+import { Card, Row, Col, Alert, Button, Modal, Image, Form } from 'react-bootstrap';
 import { authApi, endpoints } from '../../configs/API';
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
@@ -23,10 +23,13 @@ const Profile = () => {
     const [fetchError, setFetchError] = useState('');
     const [updateSuccess, setUpdateSuccess] = useState('');
     const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
     const [selectedBook, setSelectedBook] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [paymentStatus, setPaymentStatus] = useState({});
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
 
     const fetchCurrentUser = async () => {
         try {
@@ -54,8 +57,10 @@ const Profile = () => {
             const data = { ngayTraThucTe: currentDate };
 
             await api.patch(endpoints.updateChiTietPhieuMuon(bookId), data);
-            setUpdateSuccess(`Đã trả sách thành công cho sách ID: ${bookId}`);
-
+            setUpdateSuccess(`Đã trả sách thành công `);
+            setTimeout(() => {
+                setUpdateSuccess(''); // Clear the success message
+            }, 5000);
             if (currentUser) {
                 fetchBorrowedBooks(currentUser.id);
             }
@@ -68,6 +73,30 @@ const Profile = () => {
     useEffect(() => {
         fetchCurrentUser();
     }, []);
+
+    const handleChangePassword = async (e) => {
+        e.preventDefault();
+        try {
+            await api.post(endpoints.changePassword, { old_password: oldPassword, new_password: newPassword });
+            alert('Đã thay đổi mật khẩu thành công.');
+            navigate('/login');
+        } catch (error) {
+            setError('Có lỗi xảy ra khi thay đổi mật khẩu.');
+            console.error('Error changing password:', error.response?.data || error.message);
+        }
+    };
+
+    const openChangePasswordModal = () => {
+        setShowChangePasswordModal(true);
+    };
+
+    const closeChangePasswordModal = () => {
+        setShowChangePasswordModal(false);
+        setOldPassword('');
+        setNewPassword('');
+        setError('');
+    };
+
 
     const handleThanhToanMomo = async (item) => {
         try {
@@ -138,14 +167,14 @@ const Profile = () => {
         setSelectedBook(null);
     };
 
- const handlePaymentSuccess = (bookId) => {
-    setTimeout(() => {
-        setPaymentStatus((prevStatus) => ({
-            ...prevStatus,
-            [bookId]: true, 
-        }));
-    }, 10000); 
-};
+    const handlePaymentSuccess = (bookId) => {
+        setTimeout(() => {
+            setPaymentStatus((prevStatus) => ({
+                ...prevStatus,
+                [bookId]: true,
+            }));
+        }, 10000);
+    };
 
     const handleLogout = () => {
         dispatch({ type: 'logout' });
@@ -189,10 +218,17 @@ const Profile = () => {
                             <p className="about"><strong>Tên người dùng: </strong> {currentUser.last_name}</p>
                             <p className="about"><strong>Email: </strong> {currentUser.email}</p>
                             <p className="about"><strong>Số điện thoại: </strong> {currentUser.phone}</p>
+                            <p className="about">
+                                <strong>Vai trò: </strong>
+                                {currentUser.chucVu === 'doc_gia' ? 'Độc giả' :
+                                    currentUser.chucVu === 'nhan_vien' ? 'Nhân viên' :
+                                        'Chưa xác định'}
+                            </p>
+
                             {/* <p><strong>Số lần mượn sách: </strong> {currentUser.soLuongMuon}</p>
                             <p><strong>Số lần trả sách: </strong> {currentUser.soLuongTra}</p>
                             <p><strong>Số lần quá hạn mượn sách: </strong> {currentUser.soLuongQuaHan}</p> */}
-                            <Button variant="primary" className="mb-2 change-password"><LockIcon /> Đổi mật khẩu</Button>
+                            <Button variant="primary" className="mb-2 change-password" onClick={openChangePasswordModal}><LockIcon /> Đổi mật khẩu</Button>
                             <Button variant="danger" className="mb-2" onClick={handleLogout}><LogoutIcon /> Đăng xuất</Button>
                         </Col>
                     </Row>
@@ -240,7 +276,7 @@ const Profile = () => {
                                                     <>
                                                         {paymentStatus[book.id] ? (
                                                             <p className="text-success">
-                                                               <CheckIcon/>  Đã trả tiền phạt: {book.tienPhat} VNĐ
+                                                                <CheckIcon />  Đã trả tiền phạt: {book.tienPhat} VNĐ
                                                             </p>
                                                         ) : (
                                                             <>
@@ -296,6 +332,39 @@ const Profile = () => {
                             Đóng
                         </Button>
                     </Modal.Footer>
+                </Modal>
+
+                <Modal show={showChangePasswordModal} onHide={closeChangePasswordModal}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Đổi Mật Khẩu</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {error && <Alert variant="danger">{error}</Alert>}
+                        <Form onSubmit={handleChangePassword}>
+                            <Form.Group controlId="formOldPassword">
+                                <Form.Label>Mật khẩu cũ</Form.Label>
+                                <Form.Control
+                                    type="password"
+                                    placeholder="Nhập mật khẩu cũ"
+                                    value={oldPassword}
+                                    onChange={(e) => setOldPassword(e.target.value)}
+                                    required
+                                />
+                            </Form.Group>
+                            <Form.Group controlId="formNewPassword">
+                                <Form.Label>Mật khẩu mới</Form.Label>
+                                <Form.Control
+                                    type="password"
+                                    placeholder="Nhập mật khẩu mới"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    required
+                                />
+                            </Form.Group>
+
+                            <Button variant="primary" type="submit">Đổi mật khẩu</Button>
+                        </Form>
+                    </Modal.Body>
                 </Modal>
 
             </div>

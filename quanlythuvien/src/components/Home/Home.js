@@ -14,9 +14,9 @@ import MainLayout from '../Navbar/MainLayout';
 
 const Home = () => {
   const images = [
-    'https://png.pngtree.com/thumb_back/fw800/background/20240705/pngtree-an-open-book-with-colorful-smoke-coming-out-of-it-image_15975666.jpg',
-    'https://file.hstatic.net/200000090679/file/z5679281412660_7636cf5aa93594064a10a52aa07b23cf.jpg',
-    'https://tiki.vn/blog/wp-content/uploads/2023/08/thumb-12.jpg',
+    'https://tieuhoctranquoctoan.edu.vn/uploads/news/2023_03/sbia.jpg',
+    'https://thanhdo.edu.vn/wp-content/uploads/2022/09/thu20vien20tdd.jpg',
+    'https://hoinhabaobacgiang.vn/Includes/NewsImg/3_2024/30193_3.jpg',
   ];
 
   const api = authApi();
@@ -31,6 +31,7 @@ const Home = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [likeCounts, setLikeCounts] = useState({});
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -38,11 +39,27 @@ const Home = () => {
         const response = await api.get(endpoints.sach);
         setAllBooks(response.data);
         setBooks(response.data);
+        
+        // Fetch like counts concurrently for all books
+        const likeCountsData = await Promise.all(
+          response.data.map(async (book) => {
+            const likeResponse = await api.get(endpoints.likeCount(book.id));
+            return { bookId: book.id, likeCount: likeResponse.data.like_count }; // Use 'like_count'
+          })
+        );
+  
+        // Transform the results into a { bookId: likeCount } object
+        const likeCountsMap = likeCountsData.reduce((acc, curr) => {
+          acc[curr.bookId] = curr.likeCount;
+          return acc;
+        }, {});
+  
+        setLikeCounts(likeCountsMap);
       } catch (error) {
         console.error('Lỗi khi gọi API sách:', error);
       }
     };
-
+  
     const fetchCategories = async () => {
       try {
         const response = await api.get(endpoints.danhmuc);
@@ -51,10 +68,11 @@ const Home = () => {
         console.error('Lỗi khi gọi API danh mục:', error);
       }
     };
-
+  
     fetchBooks();
     fetchCategories();
   }, []);
+  
 
   const fetchComments = useCallback(async (bookId) => {
     try {
@@ -218,7 +236,8 @@ const Home = () => {
                     <div className="action-buttons mt-3">
                       <Button variant="link" className="action-btn" onClick={() => handleLike(book.id)} style={{ color: getButtonColor(book.id) }}>
                         {isBookLiked(book.id) ? <ThumbUpIcon className="action-icon" /> : <ThumbUpOffAltIcon className="action-icon" />}
-                        Thích
+                        Thích 
+                        <span className="like-count"> ({likeCounts[book.id] || 0})</span>
                       </Button>
                       <Button variant="link" className="action-btn" onClick={() => toggleComments(book.id)}>
                         <CommentIcon className="action-icon" /> Bình luận
@@ -242,7 +261,7 @@ const Home = () => {
                         <Form onSubmit={(e) => { e.preventDefault(); handleCommentSubmit(book.id); }}>
                           <Form.Control
                             type="text"
-                            placeholder="Nhập bình luận..."
+                            placeholder="Nhập bình luận..." className="cmt-text"
                             value={commentInput[book.id] || ''}
                             onChange={(e) => handleCommentChange(book.id, e.target.value)}
                           />

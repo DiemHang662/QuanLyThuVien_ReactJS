@@ -30,7 +30,7 @@ const Footer = () => {
             <h5 className='text-uppercase mb-4 font-weight-bold'>Liên Kết</h5>
             <ul className='list-unstyled'>
               <li onClick={()=> navigate('/')}>Trang chủ</li>
-              <li onClick={()=> navigate('/tongquan')}>Tổng quan</li>
+              <li onClick={()=> navigate('/')}>Tổng quan</li>
               <li onClick={()=> navigate('/tintuc')} className='text-white mb-2'>Tin tức</li>
               <li><a href='#' className='text-white mb-2'>Liên hệ</a></li>
             </ul>

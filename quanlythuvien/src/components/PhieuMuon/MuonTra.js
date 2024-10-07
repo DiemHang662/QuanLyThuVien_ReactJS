@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table, Modal, Form, Alert, Image } from 'react-bootstrap';
+import { Button, Table, Modal, Form, Alert } from 'react-bootstrap';
 import { authApi, endpoints } from '../../configs/API';
 import MainLayout from '../../components/Navbar/MainLayout';
 import Footer from '../../components/Footer/Footer';
 import CheckIcon from '@mui/icons-material/Check';
 import InfoIcon from '@mui/icons-material/Info';
+import EditNoteIcon from '@mui/icons-material/EditNote';
 import './MuonTra.css';
 
 const MuonTra = () => {
     const api = authApi();
-
+    const [selectedStatus, setSelectedStatus] = useState('all');
     const [chiTietPhieuMuons, setChiTietPhieuMuons] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [books, setBooks] = useState([]);
@@ -40,13 +41,13 @@ const MuonTra = () => {
         const fetchBooksAndUsers = async () => {
             try {
                 const [booksResponse, usersResponse, loanSlipsResponse] = await Promise.all([
-                    api.get(endpoints.sach), // Fetch books
-                    api.get(endpoints.nguoidung), // Fetch users
-                    api.get(endpoints.phieuMuon) // Fetch loan slips
+                    api.get(endpoints.sach),
+                    api.get(endpoints.nguoidung),
+                    api.get(endpoints.phieuMuon)
                 ]);
                 setBooks(booksResponse.data);
                 setUsers(usersResponse.data);
-                setLoanSlips(loanSlipsResponse.data); // Set loan slips
+                setLoanSlips(loanSlipsResponse.data);
             } catch (error) {
                 console.error('Error fetching books, users, or loan slips:', error.response?.data || error.message);
             }
@@ -59,7 +60,7 @@ const MuonTra = () => {
         setErrors({});
 
         const newChiTiet = {
-            phieuMuon: selectedLoanSlipId, // Use the selected loan slip
+            phieuMuon: selectedLoanSlipId,
             sach: selectedBookId,
         };
 
@@ -67,16 +68,9 @@ const MuonTra = () => {
             await api.post(endpoints.chiTietPhieuMuon, newChiTiet);
             const response = await api.get(endpoints.chiTietPhieuMuon);
             setChiTietPhieuMuons(response.data);
-            setSelectedUserId('');
-            setSelectedBookId('');
-            setSelectedLoanSlipId(''); // Clear selected loan slip after creation
+            resetForm();
         } catch (error) {
-            if (error.response && error.response.data) {
-                setErrors(error.response.data);
-                console.error('Error creating loan slip detail:', error.response.data);
-            } else {
-                console.error('Error creating loan slip detail:', error.message);
-            }
+            handleErrors(error);
         }
     };
 
@@ -85,7 +79,7 @@ const MuonTra = () => {
             const response = await api.get(endpoints.borrowedBooks(userId));
             setBorrowedBooks(response.data);
             setShowModal(true);
-            setSelectedChiTiet(null); // Clear selectedChiTiet to show borrowed books
+            setSelectedChiTiet(null);
         } catch (error) {
             setFetchError('Error fetching borrowed books.');
             console.error('Error fetching borrowed books:', error.response?.data || error.message);
@@ -100,17 +94,33 @@ const MuonTra = () => {
             if (selectedChiTiet?.id) {
                 await api.patch(endpoints.updateChiTietPhieuMuon(selectedChiTiet.id), selectedChiTiet);
             }
-
             const response = await api.get(endpoints.chiTietPhieuMuon);
             setChiTietPhieuMuons(response.data);
             setShowModal(false);
         } catch (error) {
-            if (error.response && error.response.data) {
-                setErrors(error.response.data);
-                console.error('Error updating loan slip detail:', error.response.data);
-            } else {
-                console.error('Error updating loan slip detail:', error.message);
-            }
+            handleErrors(error);
+        }
+    };
+
+    const filterChiTietPhieuMuons = () => {
+        if (selectedStatus === 'all') {
+            return chiTietPhieuMuons;
+        }
+        return chiTietPhieuMuons.filter(chiTiet => chiTiet.tinhTrang === selectedStatus);
+    };
+
+    const resetForm = () => {
+        setSelectedUserId('');
+        setSelectedBookId('');
+        setSelectedLoanSlipId('');
+    };
+
+    const handleErrors = (error) => {
+        if (error.response && error.response.data) {
+            setErrors(error.response.data);
+            console.error('Error:', error.response.data);
+        } else {
+            console.error('Error:', error.message);
         }
     };
 
@@ -178,7 +188,46 @@ const MuonTra = () => {
                 <Button type="submit" variant="primary" className="btn-submit">Mượn sách</Button>
             </Form>
 
-
+            <div className="status-filter">
+                <div className="d-flex flex-wrap">
+                    <Form.Check
+                        type="radio"
+                        label="Tất cả"
+                        name="status"
+                        value="all"
+                        checked={selectedStatus === 'all'}
+                        onChange={(e) => setSelectedStatus(e.target.value)}
+                        className="me-4" // Thêm khoảng cách giữa các ô
+                    />
+                    <Form.Check
+                        type="radio"
+                        label="Đang mượn"
+                        name="status"
+                        value="borrowed"
+                        checked={selectedStatus === 'borrowed'}
+                        onChange={(e) => setSelectedStatus(e.target.value)}
+                        className="me-4" // Thêm khoảng cách giữa các ô
+                    />
+                    <Form.Check
+                        type="radio"
+                        label="Đã trả"
+                        name="status"
+                        value="returned"
+                        checked={selectedStatus === 'returned'}
+                        onChange={(e) => setSelectedStatus(e.target.value)}
+                        className="me-4" // Thêm khoảng cách giữa các ô
+                    />
+                    <Form.Check
+                        type="radio"
+                        label="Quá hạn"
+                        name="status"
+                        value="late"
+                        checked={selectedStatus === 'late'}
+                        onChange={(e) => setSelectedStatus(e.target.value)}
+                        className="me-4" 
+                    />
+                </div>
+            </div>
             <Table bordered hover responsive className="table-chi-tiet">
                 <thead>
                     <tr>
@@ -195,8 +244,8 @@ const MuonTra = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {chiTietPhieuMuons.length > 0 ? (
-                        chiTietPhieuMuons.map(chiTiet => (
+                    {filterChiTietPhieuMuons().length > 0 ? (
+                        filterChiTietPhieuMuons().map(chiTiet => (
                             <tr key={chiTiet.id}>
                                 <td>{chiTiet.docGia_id}</td>
                                 <td>{chiTiet.first_name} {chiTiet.last_name}</td>
@@ -213,13 +262,12 @@ const MuonTra = () => {
                                     )}
                                 </td>
                                 <td>{chiTiet.ngayMuon}</td>
-                                <td>{chiTiet.ngayTraThucTe ? chiTiet.ngayTraThucTe : 'Chưa trả'}</td>
+                                <td>{chiTiet.ngayTraThucTe || 'Chưa trả'}</td>
                                 <td>{chiTiet.tienPhat ? `${chiTiet.tienPhat} VNĐ` : '___'}</td>
                                 <td className="action-buttons-mt">
-                                    <Button variant="primary" className="detail-mt" onClick={() => fetchBorrowedBooks(chiTiet.docGia_id)}>
+                                    <Button variant="primary" onClick={() => fetchBorrowedBooks(chiTiet.docGia_id)}>
                                         <InfoIcon />
                                     </Button>
-
                                     <Button
                                         variant="warning"
                                         onClick={() => {
@@ -227,7 +275,7 @@ const MuonTra = () => {
                                             setShowModal(true);
                                         }}
                                     >
-                                        Sửa
+                                       <EditNoteIcon />
                                     </Button>
                                 </td>
                             </tr>
@@ -242,7 +290,7 @@ const MuonTra = () => {
 
             <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
                 <Modal.Header closeButton>
-                    <Modal.Title>{selectedChiTiet ? 'Chỉnh sửa chi tiết phiếu mượn' : 'Sách đã mượn'}</Modal.Title>
+                    <Modal.Title>{selectedChiTiet ? 'Cập nhật tình trạng mượn sách' : 'Sách đã mượn'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {Object.keys(errors).length > 0 && (
@@ -262,7 +310,7 @@ const MuonTra = () => {
                                     onChange={(e) => setSelectedChiTiet({ ...selectedChiTiet, tinhTrang: e.target.value })}
                                     required
                                 >
-                                    <option value="not returned">Chưa trả</option>
+                                    <option value="borrowed">Đang mượn</option>
                                     <option value="returned">Đã trả</option>
                                     <option value="late">Quá hạn</option>
                                 </Form.Control>
@@ -280,19 +328,16 @@ const MuonTra = () => {
                             <Button type="submit" variant="primary">Cập nhật</Button>
                         </Form>
                     ) : (
-
                         <Table bordered>
                             <thead>
                                 {borrowedBooks.length > 0 && (
-                                    <>
-                                        <tr>
-                                            <td colSpan="6" className="info-table">
-                                                <p><strong>Mã người dùng:</strong> {borrowedBooks[0].id}</p>
-                                                <p><strong>Họ và tên:</strong> {borrowedBooks[0].first_name} {borrowedBooks[0].last_name}</p>
-                                                <p><strong>Số điện thoại:</strong> {borrowedBooks[0].phone}</p>
-                                            </td>
-                                        </tr>
-                                    </>
+                                    <tr>
+                                        <td colSpan="6" className="info-table">
+                                            <p><strong>Mã người dùng:</strong> {borrowedBooks[0].id}</p>
+                                            <p><strong>Họ và tên:</strong> {borrowedBooks[0].first_name} {borrowedBooks[0].last_name}</p>
+                                            <p><strong>Số điện thoại:</strong> {borrowedBooks[0].phone}</p>
+                                        </td>
+                                    </tr>
                                 )}
                                 <tr>
                                     <th>Mã Sách</th>
@@ -330,7 +375,6 @@ const MuonTra = () => {
                                 )}
                             </tbody>
                         </Table>
-
                     )}
                 </Modal.Body>
                 <Modal.Footer>

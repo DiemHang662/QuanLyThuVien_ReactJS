@@ -30,7 +30,7 @@ const TongQuan = () => {
                 setUserCount(userResponse.data.user_count);
 
                 const bookResponse = await api.get(endpoints.bookCount);
-                setBookCount(bookResponse.data.book_count);
+                setBookCount(bookResponse.data.total_books);
 
                 const interResponse = await api.get(endpoints.interCount);
                 setInterCount(interResponse.data.combined_total);
@@ -45,7 +45,7 @@ const TongQuan = () => {
         fetchCounts();
     }, []);
 
-    const colors = ['#4CAF50', '#2196F3', '#FFC107', '#F44336'];
+    const colors = ['rgb(245, 18, 67)','rgb(255, 205, 86)', 'rgb(25, 118, 210)', 'rgb(75, 192, 192)'];
 
     const chartData = {
         labels: ['Người dùng', 'Sách', 'Mượn trả', 'Lượt tương tác'],
