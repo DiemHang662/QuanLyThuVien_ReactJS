@@ -3,7 +3,7 @@ import { Line, Pie } from 'react-chartjs-2';
 import MainLayout from '../../components/Navbar/MainLayout';
 import Footer from '../../components/Footer/Footer';
 import { authApi, endpoints } from '../../configs/API';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler, ArcElement } from 'chart.js';
+import { Chart as ChartJS, CategoryScale, BarElement, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler, ArcElement } from 'chart.js';
 import './MuonTraChart.css';
 
 ChartJS.register(
@@ -11,6 +11,7 @@ ChartJS.register(
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,
     Title,
     Tooltip,
     Legend,
@@ -29,6 +30,7 @@ const MuonTraChart = () => {
         mostLateBooks: { labels: [], datasets: [] },
     });
     const [pieLoading, setPieLoading] = useState(true);
+    const [categoryStats, setCategoryStats] = useState([]); 
 
     useEffect(() => {
         const fetchChartData = async () => {
@@ -112,6 +114,41 @@ const MuonTraChart = () => {
                         ],
                     });
                     return;
+                } else if (chartType === 'categoryStatistics') {
+                    response = await authApi().get(endpoints.thongKeTheoDanhMuc);
+                    const data = response?.data || [];
+
+                    if (!Array.isArray(data)) {
+                        throw new Error('Dữ liệu không phải là một mảng.');
+                    }
+
+                    const labels = data.map(item => item.tenDanhMuc) || [];
+                    const counts = data.map(item => item.book_count) || [];
+                    const totalBooks = counts.reduce((acc, count) => acc + count, 0); 
+
+                    const percentages = counts.map(count => ((count / totalBooks) * 100).toFixed(2));
+
+                    setChartData({
+                        labels,
+                        datasets: [
+                            {
+                                label: 'Số lượng sách',
+                                data: counts,
+                                backgroundColor: 'rgba(255, 99, 132, 0.3)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 1,
+                                fill: true,
+                                tension: 0.3,
+                            },
+                        ],
+                    });
+
+                    setCategoryStats(data.map((item, index) => ({
+                        name: item.tenDanhMuc,
+                        count: item.book_count,
+                        percentage: percentages[index],
+                    })));
+                    return;
                 }
 
                 const data = response?.data || [];
@@ -159,61 +196,49 @@ const MuonTraChart = () => {
                     const borrowedData = mostBorrowedResponse?.data || [];
                     const lateData = mostLateResponse?.data || [];
 
-                    const returnedLabels = returnedData.map(item => item.tenSach);
                     const returnedCounts = returnedData.map(item => item.return_count);
-
-                    const borrowedLabels = borrowedData.map(item => item.tenSach);
                     const borrowedCounts = borrowedData.map(item => item.borrow_count);
-
-                    const lateLabels = lateData.map(item => item.tenSach);
                     const lateCounts = lateData.map(item => item.late_count);
+
+                    const totalReturned = returnedCounts.reduce((sum, count) => sum + count, 0);
+                    const totalBorrowed = borrowedCounts.reduce((sum, count) => sum + count, 0);
+                    const totalLate = lateCounts.reduce((sum, count) => sum + count, 0);
+
+                    const returnedPercentages = calculatePercentage(returnedCounts);
+                    const borrowedPercentages = calculatePercentage(borrowedCounts);
+                    const latePercentages = calculatePercentage(lateCounts);
 
                     const pieColors = ['#FF6384', '#36A2EB', '#FFD700', 'rgb(75, 192, 192, 0.9)', 'rgb(153, 102, 255, 0.8)'];
 
                     setPieChartData({
                         mostReturnedBooks: {
-                            labels: returnedLabels,
+                            labels: returnedData.map(item => item.tenSach),
                             datasets: [{
                                 data: returnedCounts,
                                 backgroundColor: pieColors,
                             }],
+                            percentages: returnedPercentages,
+                            total: totalReturned,
                         },
                         mostBorrowedBooks: {
-                            labels: borrowedLabels,
+                            labels: borrowedData.map(item => item.tenSach),
                             datasets: [{
                                 data: borrowedCounts,
                                 backgroundColor: pieColors,
                             }],
+                            percentages: borrowedPercentages,
+                            total: totalBorrowed,
                         },
                         mostLateBooks: {
-                            labels: lateLabels,
+                            labels: lateData.map(item => item.tenSach),
                             datasets: [{
                                 data: lateCounts,
                                 backgroundColor: pieColors,
                             }],
+                            percentages: latePercentages,
+                            total: totalLate,
                         },
                     });
-
-                    // Tính tỷ lệ phần trăm cho từng loại sách
-                    const returnedPercentages = calculatePercentage(returnedCounts);
-                    const borrowedPercentages = calculatePercentage(borrowedCounts);
-                    const latePercentages = calculatePercentage(lateCounts);
-
-                    setPieChartData(prevData => ({
-                        ...prevData,
-                        mostReturnedBooks: {
-                            ...prevData.mostReturnedBooks,
-                            percentages: returnedPercentages,
-                        },
-                        mostBorrowedBooks: {
-                            ...prevData.mostBorrowedBooks,
-                            percentages: borrowedPercentages,
-                        },
-                        mostLateBooks: {
-                            ...prevData.mostLateBooks,
-                            percentages: latePercentages,
-                        },
-                    }));
                 }
             } catch (error) {
                 console.error('Error fetching pie chart data:', error.response?.data || error.message);
@@ -283,6 +308,7 @@ const MuonTraChart = () => {
                         <option value="mostInteracted">Thống kê số lượt tương tác</option>
                         <option value="comparison">So sánh mượn/trả/trễ các tháng</option>
                         <option value="mostStatus">Thống kê từng tình trạng sách</option>
+                        <option value="categoryStatistics">Thống kê theo danh mục</option>
                     </select>
                 </div>
 
@@ -292,12 +318,40 @@ const MuonTraChart = () => {
                     </div>
                 )}
 
+                {chartType === 'categoryStatistics' && (
+                    <div className="category-table">
+                        <div className="category-table">
+                            <h2 className="category-title">NHẬN XÉT</h2>
+                            <table className="table-danhmuc">
+                                <thead>
+                                    <tr>
+                                        <th>Tên danh mục</th>
+                                        <th>Số lượng sách</th>
+                                        <th>%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {categoryStats.map((stat, index) => (
+                                        <tr key={index}>
+                                            <td>{stat.name}</td>
+                                            <td>{stat.count}</td>
+                                            <td>{stat.percentage}%</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
+
                 {chartType === 'mostStatus' && (
                     <div className="pie-charts">
                         {pieLoading ? (
                             <div className="loading">Loading pie chart...</div>
                         ) : (
                             <>
+                                {/* Pie chart for returned books */}
                                 <div className="pie-chart">
                                     <h2>Biểu đồ số lượng sách được trả</h2>
                                     <Pie options={pieOptions} data={pieChartData.mostReturnedBooks} />
@@ -320,6 +374,8 @@ const MuonTraChart = () => {
                                         </tbody>
                                     </table>
                                 </div>
+
+                                {/* Pie chart for borrowed books */}
                                 <div className="pie-chart">
                                     <h2>Biểu đồ số lượng sách được mượn</h2>
                                     <Pie options={pieOptions} data={pieChartData.mostBorrowedBooks} />
@@ -342,6 +398,8 @@ const MuonTraChart = () => {
                                         </tbody>
                                     </table>
                                 </div>
+
+                                {/* Pie chart for late books */}
                                 <div className="pie-chart">
                                     <h2>Biểu đồ số lượng sách bị trễ</h2>
                                     <Pie options={pieOptions} data={pieChartData.mostLateBooks} />

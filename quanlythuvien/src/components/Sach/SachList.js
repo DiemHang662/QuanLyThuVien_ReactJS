@@ -7,31 +7,51 @@ import { authApi, endpoints } from '../../configs/API';  // Adjust API config pa
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import './SachList.css'; 
+import InfoIcon from '@mui/icons-material/Info';
+import './SachList.css';
 
 const SachList = () => {
     const api = authApi();
     const navigate = useNavigate();
-
+    const [stats, setStats] = useState({});
     const [books, setBooks] = useState([]);
-    const [categories, setCategories] = useState([]);  // State for categories
+    const [categories, setCategories] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [editBook, setEditBook] = useState(null); // Book being edited
-    const [showEditModal, setShowEditModal] = useState(false); // Modal visibility
-    const [errors, setErrors] = useState({}); // To capture validation errors
+    const [editBook, setEditBook] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
-        // Fetch books
         const fetchBooks = async () => {
             try {
                 const response = await api.get(endpoints.sach);
                 setBooks(response.data);
+
+                const statsPromises = response.data.map(book =>
+                    api.get(endpoints.soLanMuonTraQuaHan(book.id))
+                        .then(statResponse => ({
+                            id: book.id,
+                            ...statResponse.data,
+                        }))
+                        .catch(error => ({
+                            id: book.id,
+                            borrowed_count: 0,
+                            returned_count: 0,
+                            late_count: 0,
+                        }))
+                );
+
+                const statsResults = await Promise.all(statsPromises);
+                const statsMap = statsResults.reduce((acc, stat) => {
+                    acc[stat.id] = stat;
+                    return acc;
+                }, {});
+                setStats(statsMap);
             } catch (error) {
                 console.error('Error fetching books:', error.response?.data || error.message);
             }
         };
 
-        // Fetch categories
         const fetchCategories = async () => {
             try {
                 const response = await api.get(endpoints.danhmuc);
@@ -45,7 +65,6 @@ const SachList = () => {
         fetchCategories();
     }, []);
 
-    // Filter books based on search term
     const filteredBooks = books.filter(book =>
         book.tenSach.toLowerCase().includes(searchTerm.toLowerCase()) ||
         book.tenTacGia.toLowerCase().includes(searchTerm.toLowerCase())
@@ -56,6 +75,9 @@ const SachList = () => {
             try {
                 await api.delete(endpoints.deleteSach(id));
                 setBooks(books.filter(book => book.id !== id));
+                const newStats = { ...stats };
+                delete newStats[id];
+                setStats(newStats);
             } catch (error) {
                 console.error('Error deleting book:', error.response?.data || error.message);
             }
@@ -64,7 +86,7 @@ const SachList = () => {
 
     const handleEditSubmit = async (e) => {
         e.preventDefault();
-        setErrors({}); // Reset errors
+        setErrors({});
 
         if (editBook) {
             try {
@@ -74,7 +96,7 @@ const SachList = () => {
                 formData.append('nXB', editBook.nXB);
                 formData.append('namXB', editBook.namXB);
                 formData.append('soLuong', editBook.soLuong);
-                formData.append('danhMuc', editBook.danhMuc); 
+                formData.append('danhMuc', editBook.danhMuc);
                 if (editBook.anhSach) {
                     formData.append('anhSach', editBook.anhSach);
                 }
@@ -90,11 +112,8 @@ const SachList = () => {
                     });
                 }
 
-                // Refresh the books list
                 const booksResponse = await api.get(endpoints.sach);
                 setBooks(booksResponse.data);
-
-                // Close the modal and reset editBook
                 setShowEditModal(false);
                 setEditBook(null);
             } catch (error) {
@@ -149,20 +168,23 @@ const SachList = () => {
                 <Table bordered hover responsive className="table-book">
                     <thead>
                         <tr>
+                            <th>STT</th>
                             <th>Ảnh bìa</th>
                             <th>Tên sách</th>
                             <th>Tác giả</th>
                             <th>Nhà xuất bản</th>
                             <th>Năm xuất bản</th>
                             <th>Danh mục</th>
-                            <th>Số lượng</th>
-                            <th>Số sách đang mượn</th>
+                            <th>Còn lại</th>
+                            <th>Đang mượn</th>
+                            <th>Tổng mượn - trả - quá hạn</th>
                             <th>Tác vụ</th>
                         </tr>
                     </thead>
                     <tbody>
                         {filteredBooks.map(book => (
                             <tr key={book.id}>
+                                <td>{book.id}</td>
                                 <td>
                                     {book.anhSach_url && <Image src={book.anhSach_url} className="book-img" />}
                                 </td>
@@ -173,6 +195,7 @@ const SachList = () => {
                                 <td>{book.tenDanhMuc}</td>
                                 <td>{book.soLuong}</td>
                                 <td>{book.soSachDangMuon}</td>
+                                <td>{stats[book.id]?.borrowed_count ?? 0}  {stats[book.id]?.returned_count ?? 0}  {stats[book.id]?.late_count ?? 0}</td>
                                 <td className="action-buttons-book">
                                     <Button
                                         variant="warning"
@@ -197,96 +220,113 @@ const SachList = () => {
                     </tbody>
                 </Table>
 
-                {/* Edit Book Modal */}
-                <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+                <Modal show={showEditModal} onHide={() => setShowEditModal(false)} size="lg">
                     <Modal.Header closeButton>
                         <Modal.Title>{editBook?.id ? 'Chỉnh sửa sách' : 'Thêm sách'}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Form onSubmit={handleEditSubmit} encType="multipart/form-data">
-                            <Form.Group controlId="tenSach">
-                                <Form.Label>Tên sách</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={editBook?.tenSach || ''}
-                                    onChange={(e) => setEditBook({ ...editBook, tenSach: e.target.value })}
-                                    isInvalid={!!errors.tenSach}
-                                    required
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    {errors.tenSach && errors.tenSach.join(', ')}
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                            <Form.Group controlId="tenTacGia">
-                                <Form.Label>Tác giả</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={editBook?.tenTacGia || ''}
-                                    onChange={(e) => setEditBook({ ...editBook, tenTacGia: e.target.value })}
-                                    isInvalid={!!errors.tenTacGia}
-                                    required
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    {errors.tenTacGia && errors.tenTacGia.join(', ')}
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                            <Form.Group controlId="nXB">
-                                <Form.Label>Nhà xuất bản</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={editBook?.nXB || ''}
-                                    onChange={(e) => setEditBook({ ...editBook, nXB: e.target.value })}
-                                    isInvalid={!!errors.nXB}
-                                    required
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    {errors.nXB && errors.nXB.join(', ')}
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                            <Form.Group controlId="namXB">
-                                <Form.Label>Năm xuất bản</Form.Label>
-                                <Form.Control
-                                    type="number"
-                                    value={editBook?.namXB || ''}
-                                    onChange={(e) => setEditBook({ ...editBook, namXB: e.target.value })}
-                                    isInvalid={!!errors.namXB}
-                                    required
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    {errors.namXB && errors.namXB.join(', ')}
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                            <Form.Group controlId="soLuong">
-                                <Form.Label>Số lượng</Form.Label>
-                                <Form.Control
-                                    type="number"
-                                    value={editBook?.soLuong || ''}
-                                    onChange={(e) => setEditBook({ ...editBook, soLuong: e.target.value })}
-                                    isInvalid={!!errors.soLuong}
-                                    required
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    {errors.soLuong && errors.soLuong.join(', ')}
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                            <Form.Group controlId="danhMuc">
-                                <Form.Label>Danh mục</Form.Label>
-                                <Form.Control
-                                    as="select"
-                                    value={editBook?.danhMuc || ''}
-                                    onChange={(e) => setEditBook({ ...editBook, danhMuc: e.target.value })}
-                                    isInvalid={!!errors.danhMuc}
-                                    required
-                                >
-                                    <option value="">Chọn danh mục</option>
-                                    {categories.map(cat => (
-                                        <option key={cat.id} value={cat.id}>{cat.tenDanhMuc}</option>
-                                    ))}
-                                </Form.Control>
-                                <Form.Control.Feedback type="invalid">
-                                    {errors.danhMuc && errors.danhMuc.join(', ')}
-                                </Form.Control.Feedback>
-                            </Form.Group>
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <Form.Group controlId="tenSach">
+                                        <Form.Label>Tên sách</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            value={editBook?.tenSach || ''}
+                                            onChange={(e) => setEditBook({ ...editBook, tenSach: e.target.value })}
+                                            isInvalid={!!errors.tenSach}
+                                            required
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.tenSach && errors.tenSach.join(', ')}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </div>
+                                <div className="col-md-6">
+                                    <Form.Group controlId="tenTacGia">
+                                        <Form.Label>Tác giả</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            value={editBook?.tenTacGia || ''}
+                                            onChange={(e) => setEditBook({ ...editBook, tenTacGia: e.target.value })}
+                                            isInvalid={!!errors.tenTacGia}
+                                            required
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.tenTacGia && errors.tenTacGia.join(', ')}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <Form.Group controlId="nXB">
+                                        <Form.Label>Nhà xuất bản</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            value={editBook?.nXB || ''}
+                                            onChange={(e) => setEditBook({ ...editBook, nXB: e.target.value })}
+                                            isInvalid={!!errors.nXB}
+                                            required
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.nXB && errors.nXB.join(', ')}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </div>
+                                <div className="col-md-6">
+                                    <Form.Group controlId="namXB">
+                                        <Form.Label>Năm xuất bản</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            value={editBook?.namXB || ''}
+                                            onChange={(e) => setEditBook({ ...editBook, namXB: e.target.value })}
+                                            isInvalid={!!errors.namXB}
+                                            required
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.namXB && errors.namXB.join(', ')}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <Form.Group controlId="soLuong">
+                                        <Form.Label>Số lượng</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            value={editBook?.soLuong || ''}
+                                            onChange={(e) => setEditBook({ ...editBook, soLuong: e.target.value })}
+                                            isInvalid={!!errors.soLuong}
+                                            required
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.soLuong && errors.soLuong.join(', ')}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </div>
+                                <div className="col-md-6">
+                                    <Form.Group controlId="danhMuc">
+                                        <Form.Label>Danh mục</Form.Label>
+                                        <Form.Control
+                                            as="select"
+                                            value={editBook?.danhMuc || ''}
+                                            onChange={(e) => setEditBook({ ...editBook, danhMuc: e.target.value })}
+                                            isInvalid={!!errors.danhMuc}
+                                            required
+                                        >
+                                            <option value="">Chọn danh mục</option>
+                                            {categories.map(cat => (
+                                                <option key={cat.id} value={cat.id}>{cat.tenDanhMuc}</option>
+                                            ))}
+                                        </Form.Control>
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.danhMuc && errors.danhMuc.join(', ')}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </div>
+                            </div>
                             <Form.Group controlId="anhSach">
                                 <Form.Label>Ảnh bìa</Form.Label>
                                 <Form.Control
@@ -303,7 +343,7 @@ const SachList = () => {
                                     </div>
                                 )}
                             </Form.Group>
-                            <Button type="submit" variant="primary" className="mt-3">
+                            <Button type="submit" variant="primary" className="text-center mt-3">
                                 Lưu
                             </Button>
                         </Form>

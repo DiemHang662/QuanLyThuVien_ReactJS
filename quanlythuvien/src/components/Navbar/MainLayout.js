@@ -2,13 +2,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Navbar, Container, Nav, Button, Form, FormControl, Dropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
-import ChatIcon from '@mui/icons-material/Chat';
-import SearchIcon from '@mui/icons-material/Search';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import SpeedIcon from '@mui/icons-material/Speed';
-import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
+import PersonIcon from '@mui/icons-material/Person';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import { MyUserContext, MyDispatchContext } from '../../configs/Contexts';
 import { useNavigate } from 'react-router-dom';
@@ -101,26 +97,13 @@ const MainLayout = ({ children, searchTerm, setSearchTerm, onSearch }) => {
                 )}
               </Nav>
 
-              <Form className="d-flex">
-                <FormControl
-                  type="search"
-                  placeholder="  Tìm sách..."
-                  className="me-4"
-                  aria-label="Search"
-                  value={searchTerm}
-                  onChange={handleChange}
-                />
-                <Button variant="outline-dark" className="bt-search" onClick={() => onSearch(searchTerm)}>
-                  <SearchIcon />
-                </Button>
-              </Form>
-
               {!user ? (
                 <Button as={Link} to="/login" className="btn-login ms-3" variant="outline-dark">
                   <AccountCircleIcon />
                 </Button>
               ) : (
-                <>            
+                <>    
+                 <Nav.Link>Chào, {user.first_name} {user.last_name}</Nav.Link>      
                   <Dropdown align="end" className="ms-3">
                     <Dropdown.Toggle variant="light" className="d-flex align-items-center">
                       <img src={user.avatar_url} alt="Avatar" className="img-avatar rounded-circle" />

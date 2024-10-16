@@ -50,8 +50,12 @@
     background-color: #218838;
   }
 
+  .book-button-primary{
+    margin-right: 3px;
+  }
+
   .book-button-warning{
-    margin-right: 5px;
+    margin-right: 3px;
   }
   
   .title-list {

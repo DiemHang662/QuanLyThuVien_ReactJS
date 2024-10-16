@@ -149,6 +149,12 @@
   font-weight: 500;
 }
 
+.text{
+  font-size: 18px;
+  color: red;
+  
+}
+
 button {
   background-color: #007bff;
   color: white;

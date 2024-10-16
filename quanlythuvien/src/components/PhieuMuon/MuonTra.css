@@ -1,64 +1,73 @@
-.table-chi-tiet{
+.table-chi-tiet {
     width: 98%;
     margin: 15px 10px;
 }
 
-.title-list{
+.title-list {
     font-size: 30px;
     text-transform: uppercase;
 }
 
-.action-buttons-mt{
+.action-buttons-mt {
     display: flex;
 }
 
-.action-buttons-mt Button{
+.action-buttons-mt Button {
     margin-right: 3px;
 }
 
 
-.detail-mt{
+.detail-mt {
     margin-right: 5px;
 }
 
-.anhsach{
+.anhsach {
     width: 40px;
 }
 
-.create-ctpm-form {
-    display: flex;
-    flex-direction: column;
-    margin: 10px 50px;
+.search-ctpm {
+    margin: 15px 60px;
+    width: 87%;
+    border-radius: 20px;
+    padding: 10px;
+}
+
+.form1-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    border: 1px solid #f3f0f0;
 }
 
 .form-row {
-    display: flex; 
-    justify-content: center; 
+    display: flex;
+    justify-content: center;
     margin-bottom: 20px;
 }
 
-.form-row > div {
-    margin: 0 10px; 
-    flex: 1; 
+.form-row>div {
+    margin: 0 10px;
+    flex: 1;
 }
 
-.btn-submit {
-    margin-top: 10px; 
-    width: 100%; 
-    max-width: 300px; 
-    display: block; 
+.btn-container {
+    display: flex;
+    justify-content: center; 
+    margin-top: 20px; 
 }
 
-.info-table p{
+.info-table p {
     text-align: left;
 }
 
 .status-filter {
-    margin: 20px 400px; 
+    margin: 20px 400px;
     text-align: center;
     align-items: center;
 }
 
 .status-filter .form-check {
-    margin-right: 10px; 
+    margin-right: 10px;
 }

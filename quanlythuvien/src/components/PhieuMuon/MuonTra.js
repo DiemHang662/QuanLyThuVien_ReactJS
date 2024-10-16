@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table, Modal, Form, Alert } from 'react-bootstrap';
+import { Button, Table, Modal, Form, Alert} from 'react-bootstrap';
 import { authApi, endpoints } from '../../configs/API';
 import MainLayout from '../../components/Navbar/MainLayout';
 import Footer from '../../components/Footer/Footer';
 import CheckIcon from '@mui/icons-material/Check';
 import InfoIcon from '@mui/icons-material/Info';
 import EditNoteIcon from '@mui/icons-material/EditNote';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import './MuonTra.css';
 
 const MuonTra = () => {
@@ -18,11 +19,17 @@ const MuonTra = () => {
     const [loanSlips, setLoanSlips] = useState([]);
     const [selectedChiTiet, setSelectedChiTiet] = useState(null);
     const [selectedBookId, setSelectedBookId] = useState('');
+    const [selectedBookTitle, setSelectedBookTitle] = useState('');
     const [selectedUserId, setSelectedUserId] = useState('');
     const [selectedLoanSlipId, setSelectedLoanSlipId] = useState('');
     const [borrowedBooks, setBorrowedBooks] = useState([]);
     const [errors, setErrors] = useState({});
     const [fetchError, setFetchError] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const toggleDropdown = () => {
+        setIsDropdownOpen(!isDropdownOpen);
+    };
 
     useEffect(() => {
         const fetchChiTietPhieuMuons = async () => {
@@ -103,18 +110,32 @@ const MuonTra = () => {
     };
 
     const filterChiTietPhieuMuons = () => {
-        if (selectedStatus === 'all') {
-            return chiTietPhieuMuons;
-        }
-        return chiTietPhieuMuons.filter(chiTiet => chiTiet.tinhTrang === selectedStatus);
+        return chiTietPhieuMuons.filter(chiTiet => {
+            const fullName = `${chiTiet.first_name} ${chiTiet.last_name}`.toLowerCase();
+            const loanSlipId = chiTiet.phieuMuon_id.toString();
+            const bookTitle = chiTiet.tenSach.toLowerCase();
+    
+            // Kiểm tra tình trạng
+            const isStatusMatch = selectedStatus === 'all' || 
+                (selectedStatus === 'borrowed' && chiTiet.tinhTrang === 'borrowed') ||
+                (selectedStatus === 'returned' && chiTiet.tinhTrang === 'returned') ||
+                (selectedStatus === 'late' && chiTiet.tinhTrang === 'late');
+    
+            return (fullName.includes(searchTerm.toLowerCase()) ||
+                    loanSlipId.includes(searchTerm) ||
+                    bookTitle.includes(searchTerm)) && 
+                    isStatusMatch;
+        });
     };
 
     const resetForm = () => {
         setSelectedUserId('');
-        setSelectedBookId('');
+        setSelectedBookTitle('');
         setSelectedLoanSlipId('');
+        setSearchTerm(''); // Đặt lại trường tìm kiếm
+        setSelectedStatus('all'); // Đặt lại tình trạng về "Tất cả"
     };
-
+    
     const handleErrors = (error) => {
         if (error.response && error.response.data) {
             setErrors(error.response.data);
@@ -123,118 +144,144 @@ const MuonTra = () => {
             console.error('Error:', error.message);
         }
     };
-
+    
     return (
         <>
             <MainLayout />
-            <h1 className="title-list">Danh Sách Chi Tiết Phiếu Mượn</h1>
-
+    
             {fetchError && <Alert variant="danger">{fetchError}</Alert>}
+    
+            <h1 className="title-list">Danh Sách Chi Tiết Phiếu Mượn</h1>
+    
+             <div className="status-filter">
+            <div className="d-flex flex-wrap">
+                <Form.Check
+                    type="radio"
+                    label="Tất cả"
+                    name="status"
+                    value="all"
+                    checked={selectedStatus === 'all'}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    className="me-4"
+                />
+                <Form.Check
+                    type="radio"
+                    label="Đang mượn"
+                    name="status"
+                    value="borrowed"
+                    checked={selectedStatus === 'borrowed'}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    className="me-4"
+                />
+                <Form.Check
+                    type="radio"
+                    label="Đã trả"
+                    name="status"
+                    value="returned"
+                    checked={selectedStatus === 'returned'}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    className="me-4"
+                />
+                <Form.Check
+                    type="radio"
+                    label="Quá hạn"
+                    name="status"
+                    value="late"
+                    checked={selectedStatus === 'late'}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    className="me-4"
+                />
+            </div>
+        </div>
 
-            <Form onSubmit={handleCreateChiTietPhieuMuon} className="create-ctpm-form">
-                <div className="form-row">
-                    <Form.Group controlId="phiếuMuốn">
-                        <Form.Label>Phiếu Mượn</Form.Label>
-                        <Form.Control
-                            as="select"
-                            value={selectedLoanSlipId}
-                            onChange={(e) => setSelectedLoanSlipId(e.target.value)}
-                            required
-                        >
-                            <option value="">Chọn phiếu mượn</option>
-                            {loanSlips.map(loanSlip => (
-                                <option key={loanSlip.id} value={loanSlip.id}>
-                                    {loanSlip.id} - {loanSlip.first_name} {loanSlip.last_name} - {loanSlip.ngayMuon} - {loanSlip.ngayTraDuKien}
-                                </option>
-                            ))}
-                        </Form.Control>
-                    </Form.Group>
+        <Form.Group controlId="search">
+            <Form.Control className="search-ctpm"
+                type="text"
+                placeholder="Nhập tên độc giả, mã phiếu mượn..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+            />
+        </Form.Group>
 
-                    <Form.Group controlId="docGia">
-                        <Form.Label>Người Mượn</Form.Label>
-                        <Form.Control
-                            as="select"
-                            value={selectedUserId}
-                            onChange={(e) => setSelectedUserId(e.target.value)}
-                            required
-                        >
-                            <option value="">Chọn người mượn</option>
-                            {users.map(user => (
-                                <option key={user.id} value={user.id}>
-                                    {user.first_name} {user.last_name}
-                                </option>
-                            ))}
-                        </Form.Control>
-                    </Form.Group>
-                </div>
 
-                <Form.Group controlId="sach">
-                    <Form.Label>Sách</Form.Label>
-                    <Form.Control
-                        as="select"
-                        value={selectedBookId}
-                        onChange={(e) => setSelectedBookId(e.target.value)}
-                        required
-                    >
-                        <option value="">Chọn sách</option>
-                        {books.map(book => (
-                            <option key={book.id} value={book.id}>
-                                {book.tenSach}
-                            </option>
-                        ))}
-                    </Form.Control>
+            <div className="form1-container">
+                <Form.Group controlId="borrowDropdown">
+                    <Button variant="primary" onClick={toggleDropdown}>
+                        {isDropdownOpen ? <ArrowDropDownIcon /> : 'Cập nhật thông tin mượn sách'}
+                    </Button>
                 </Form.Group>
 
-                <Button type="submit" variant="primary" className="btn-submit">Mượn sách</Button>
-            </Form>
+                {isDropdownOpen && (
+                    <>
+                        <Form onSubmit={handleCreateChiTietPhieuMuon} >
+                            <div className="form-row">
+                                <Form.Group controlId="phiếuMuốn">
+                                    <Form.Label>Phiếu Mượn</Form.Label>
+                                    <Form.Control
+                                        as="select"
+                                        value={selectedLoanSlipId}
+                                        onChange={(e) => setSelectedLoanSlipId(e.target.value)}
+                                        required
+                                    >
+                                        <option value="">Chọn phiếu mượn</option>
+                                        {loanSlips.map(loanSlip => (
+                                            <option key={loanSlip.id} value={loanSlip.id}>
+                                                {loanSlip.id} - {loanSlip.first_name} {loanSlip.last_name} - {loanSlip.ngayMuon} - {loanSlip.ngayTraDuKien}
+                                            </option>
+                                        ))}
+                                    </Form.Control>
+                                </Form.Group>
 
-            <div className="status-filter">
-                <div className="d-flex flex-wrap">
-                    <Form.Check
-                        type="radio"
-                        label="Tất cả"
-                        name="status"
-                        value="all"
-                        checked={selectedStatus === 'all'}
-                        onChange={(e) => setSelectedStatus(e.target.value)}
-                        className="me-4" // Thêm khoảng cách giữa các ô
-                    />
-                    <Form.Check
-                        type="radio"
-                        label="Đang mượn"
-                        name="status"
-                        value="borrowed"
-                        checked={selectedStatus === 'borrowed'}
-                        onChange={(e) => setSelectedStatus(e.target.value)}
-                        className="me-4" // Thêm khoảng cách giữa các ô
-                    />
-                    <Form.Check
-                        type="radio"
-                        label="Đã trả"
-                        name="status"
-                        value="returned"
-                        checked={selectedStatus === 'returned'}
-                        onChange={(e) => setSelectedStatus(e.target.value)}
-                        className="me-4" // Thêm khoảng cách giữa các ô
-                    />
-                    <Form.Check
-                        type="radio"
-                        label="Quá hạn"
-                        name="status"
-                        value="late"
-                        checked={selectedStatus === 'late'}
-                        onChange={(e) => setSelectedStatus(e.target.value)}
-                        className="me-4" 
-                    />
-                </div>
+                                <Form.Group controlId="docGia">
+                                    <Form.Label>Người Mượn</Form.Label>
+                                    <Form.Control
+                                        as="select"
+                                        value={selectedUserId}
+                                        onChange={(e) => setSelectedUserId(e.target.value)}
+                                        required
+                                    >
+                                        <option value="">Chọn người mượn</option>
+                                        {users.map(user => (
+                                            <option key={user.id} value={user.id}>
+                                                {user.first_name} {user.last_name}
+                                            </option>
+                                        ))}
+                                    </Form.Control>
+                                </Form.Group>
+                            </div>
+
+                            <Form.Group controlId="sach">
+                                <Form.Label>Sách</Form.Label>
+                                <Form.Control
+                                    as="select"
+                                    value={selectedBookId}
+                                    onChange={(e) => setSelectedBookId(e.target.value)}
+                                    required
+                                >
+                                    <option value="">Chọn sách</option>
+                                    {books.map(book => (
+                                        <option key={book.id} value={book.id}>
+                                            {book.tenSach}
+                                        </option>
+                                    ))}
+                                </Form.Control>
+                            </Form.Group>
+
+                            <div className="btn-container">
+                                <Button type="submit" variant="primary" className="btn-submit">Mượn sách</Button>
+                            </div>
+                        </Form>
+                    </>
+                )}
             </div>
+
+
             <Table bordered hover responsive className="table-chi-tiet">
                 <thead>
                     <tr>
-                        <th>Mã</th>
+                        <th>STT</th>
                         <th>Người mượn</th>
                         <th>Mã phiếu</th>
-                        <th>Mã sách</th>
                         <th>Tên Sách</th>
                         <th>Tình Trạng</th>
                         <th>Ngày Mượn</th>
@@ -247,10 +294,9 @@ const MuonTra = () => {
                     {filterChiTietPhieuMuons().length > 0 ? (
                         filterChiTietPhieuMuons().map(chiTiet => (
                             <tr key={chiTiet.id}>
-                                <td>{chiTiet.docGia_id}</td>
+                                <td>{chiTiet.id}</td>
                                 <td>{chiTiet.first_name} {chiTiet.last_name}</td>
                                 <td>{chiTiet.phieuMuon_id}</td>
-                                <td>{chiTiet.sach_id}</td>
                                 <td>{chiTiet.tenSach}</td>
                                 <td>
                                     {chiTiet.tinhTrang === 'returned' ? (
@@ -275,7 +321,7 @@ const MuonTra = () => {
                                             setShowModal(true);
                                         }}
                                     >
-                                       <EditNoteIcon />
+                                        <EditNoteIcon />
                                     </Button>
                                 </td>
                             </tr>

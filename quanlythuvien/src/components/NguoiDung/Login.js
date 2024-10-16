@@ -67,59 +67,66 @@ const Login = () => {
     <div className="background">
       <div className="container-login">
         <div className="formLogin">
-        <h1 className="title">ĐĂNG NHẬP</h1>
-        <Form>
-          <Form.Group controlId="formBasicUserType">
-            <Form.Select
-              value={userType}
-              onChange={(e) => setUserType(e.target.value)}
-              className={`input ${isFocused ? 'focused' : ''}`}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-            >
-              <option value="regular">Độc giả</option>
-              <option value="superuser">Nhân viên thư viện</option>
-            </Form.Select>
-          </Form.Group>
+          <h1 className="title">ĐĂNG NHẬP</h1>
+          <Form>
+            <Form.Group controlId="formBasicUserType">
+              <Form.Select
+                value={userType}
+                onChange={(e) => setUserType(e.target.value)}
+                className={`input ${isFocused ? 'focused' : ''}`}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+              >
+                <option value="regular">Độc giả</option>
+                <option value="superuser">Nhân viên thư viện</option>
+              </Form.Select>
+            </Form.Group>
 
-          <Form.Group controlId="formBasicUsername">
-            <Form.Control
-              type="text"
-              placeholder="Tên đăng nhập..."
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="input"
-              autoComplete="username"
-            />
-          </Form.Group>
-          <Form.Group controlId="formBasicPassword" className="position-relative">
-            <Form.Control
-              type={secureTextEntry ? 'password' : 'text'}
-              placeholder="Mật khẩu..."
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="input"
-              autoComplete="current-password"
-            />
-            <Button
-              variant="link"
-              className="password-toggle"
-              onClick={() => setSecureTextEntry(!secureTextEntry)}
-            >
-              {secureTextEntry ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            <Form.Group controlId="formBasicUsername">
+              <Form.Control
+                type="text"
+                placeholder="Tên đăng nhập..."
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="input"
+                autoComplete="username"
+              />
+            </Form.Group>
+            <Form.Group controlId="formBasicPassword" className="position-relative">
+              <Form.Control
+                type={secureTextEntry ? 'password' : 'text'}
+                placeholder="Mật khẩu..."
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="input"
+                autoComplete="current-password"
+              />
+              <Button
+                variant="link"
+                className="password-toggle"
+                onClick={() => setSecureTextEntry(!secureTextEntry)}
+              >
+                {secureTextEntry ? <VisibilityOffIcon /> : <VisibilityIcon />}
+              </Button>
+            </Form.Group>
+            {error && (
+              <Alert variant="danger" style={{ width: '95%', margin: '10px 20px', height: '60px' }}>
+                {error}
+              </Alert>
+            )}
+            <Button variant="success" onClick={login} className="loginBtn">
+              ĐĂNG NHẬP
             </Button>
-          </Form.Group>
-          {error && (
-            <Alert variant="danger" style={{ width: '95%', margin: '10px 20px', height: '60px' }}>
-              {error}
-            </Alert>
-          )}
-          <Button variant="success" onClick={login} className="loginBtn">
-            ĐĂNG NHẬP
-          </Button>
-        </Form>
+
+            <div className="register-contain">
+              <p>Bạn chưa có tài khoản ?</p>
+              <Button variant="success" onClick={() => navigate('/dangki')} className="registerBtn">
+                ĐĂNG KÝ
+              </Button>
+            </div>
+          </Form>
+        </div>
       </div>
-    </div>
     </div>
   );
 };

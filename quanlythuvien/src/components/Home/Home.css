@@ -51,11 +51,24 @@ h1 {
   margin: 10px 3px;
 }
 
-.book-item:hover {
+.book-item1 {
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 19%;
+  height: 280px;
+  overflow: hidden;
+  text-align: center;
+  margin: 10px 5px;
+  position: relative;
+}
+
+.book-item:hover,
+.book-item1:hover {
   opacity: 0.8;
 }
 
-.book-item.expanded {
+.book-item.expanded,
+.book-item1.expanded {
   height: auto;
 }
 
@@ -73,7 +86,7 @@ h1 {
   background-color: white !important;
   color: #4CAF50 !important;
   border: 1px solid #4CAF50 !important;
-  width: 57%;
+  width: 60%;
   height: 35px;
   margin-left: 5px;
   font-size: 13px;
@@ -92,22 +105,49 @@ h1 {
   border-bottom: 1px solid #ddd;
 }
 
-.book-item h3 {
+.book-image1 {
+  width: 100%;
+  height: 200px;
+  margin-bottom: 5px;
+  object-fit: cover;
+  border-bottom: 1px solid #ddd;
+}
+
+.book-item h3,
+.book-item1 h3 {
   margin: 10px 0;
   color: crimson;
   font-size: 14px;
 }
 
-.book-item h4 {
+.book-item1 h3{
+  font-size: 13px;
+}
+
+.book-item h4,
+.book-item1 h4 {
   margin: 10px 0;
   color: dodgerblue;
   font-size: 12px;
 }
 
-.book-item p {
+.book-item p,
+.book-item1 p {
   font-size: 15px;
   color: #666;
   padding: 0 10px;
+}
+
+.new-badge {
+  position: absolute;
+  top: 3px; 
+  right: 0; 
+  background-color: yellow; 
+  color: red; 
+  padding: 3px 10px; 
+  font-weight: bold;
+  z-index: 1; 
+  font-size: 11px;
 }
 
 .action-buttons {
@@ -177,8 +217,37 @@ h1 {
   background-color: #f8f9fa;
 }
 
+.title-border {
+  width: 100%;
+  margin-top: 15px;
+  padding: 0; 
+  position: relative; 
+}
+
+.title-recent {
+  font-weight: bold;
+  width: 30%;
+  background-color: #4CAF50;
+  color: white; 
+  text-align: center; 
+  margin-left: 0; 
+  position: relative;
+  z-index: 1;
+}
+
+.title-border::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 2px; 
+  background-color: #4CAF50; 
+  position: absolute;
+  bottom: 0; 
+  left: 0; 
+}
+
 .book-list {
-  width: 82%;
+  width: 85%;
   padding: 5px;
 }
 
@@ -200,4 +269,39 @@ h1 {
   background-color: #4CAF50;
   color: white;
   font-weight: bold;
+}
+
+.category-container {
+  text-align: center;
+  margin: 20px 100px;
+  width: 80%;
+}
+
+.category-list {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.category-item {
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 7px;
+  margin: 7px;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.2s;
+  flex: 0 0 calc(25% - 20px); 
+  box-sizing: border-box; 
+  color: black;
+  border-radius: 5px;
+}
+
+.category-item:hover {
+  transform: scale(1.05); 
+}
+
+.category-icon {
+  width: 60px; 
+  height: 50px; 
 }

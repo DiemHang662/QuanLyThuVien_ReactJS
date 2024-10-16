@@ -15,7 +15,6 @@ const PhieuMuonList = () => {
 
     const [phieuMuons, setPhieuMuons] = useState([]); 
     const [docGias, setDocGias] = useState([]); 
-    const [sachs, setSachs] = useState([]); // State for books
     const [searchTerm, setSearchTerm] = useState('');
     const [editPhieuMuon, setEditPhieuMuon] = useState(null); 
     const [showEditModal, setShowEditModal] = useState(false); 
@@ -25,13 +24,15 @@ const PhieuMuonList = () => {
         const fetchPhieuMuons = async () => {
             try {
                 const response = await api.get(endpoints.phieuMuon);
-                console.log(response.data); // Inspect the response
-                setPhieuMuons(response.data);
+                // Sắp xếp phiếu mượn theo ngày mượn từ mới nhất đến cũ nhất
+                const sortedPhieuMuons = response.data.sort((a, b) => new Date(b.ngayMuon) - new Date(a.ngayMuon));
+                console.log(sortedPhieuMuons); // Inspect the sorted response
+                setPhieuMuons(sortedPhieuMuons);
             } catch (error) {
                 console.error('Error fetching loan slips:', error.response?.data || error.message);
             }
         };
-    
+
         fetchPhieuMuons();
     }, []);
     
@@ -43,7 +44,7 @@ const PhieuMuonList = () => {
     useEffect(() => {
         const fetchDocGias = async () => {
             try {
-                const response = await api.get(endpoints.nguoidung); // Adjust API endpoint accordingly
+                const response = await api.get(endpoints.nguoidung);
                 setDocGias(response.data);
             } catch (error) {
                 console.error('Error fetching readers:', error.response?.data || error.message);
@@ -85,7 +86,8 @@ const PhieuMuonList = () => {
 
                 // Refresh loan slips list
                 const phieuMuonsResponse = await api.get(endpoints.phieuMuon);
-                setPhieuMuons(phieuMuonsResponse.data);
+                const sortedPhieuMuons = phieuMuonsResponse.data.sort((a, b) => new Date(b.ngayMuon) - new Date(a.ngayMuon));
+                setPhieuMuons(sortedPhieuMuons);
 
                 // Close the modal and reset editPhieuMuon
                 setShowEditModal(false);
@@ -139,7 +141,7 @@ const PhieuMuonList = () => {
                     <thead>
                         <tr>
                             <th>Độc giả</th>
-                            <th>Ngày mượn</th>
+                            <th>Ngày lập</th>
                             <th>Ngày trả dự kiến</th>
                             <th>Tác vụ</th>
                         </tr>

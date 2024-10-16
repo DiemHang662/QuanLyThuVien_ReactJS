@@ -1,33 +1,87 @@
 .container-login {
     display: flex;
-    width: 100vw; /* Full width of the viewport */
-    height: 110vh; /* Full height of the viewport */
-    background-color: whitesmoke;
-    background-image: url('https://watermark.lovepik.com/photo/20211123/large/lovepik-library-interior-decoration-effect-map-picture_500778570.jpg');
+    justify-content: center; /* Center contents horizontally */
+    align-items: center; /* Center contents vertically */
+    width: 100vw; 
+    height: 100vh;
+    background: url('https://koala.sh/api/image/v2-9ehxg-qrf0z.jpg?width=1344&height=768&dream') no-repeat center center fixed; /* Background image */
     background-size: cover;
-    background-position: center;
-    justify-content: center;
-    align-items: center;
-    color: black;
-    padding: 0; /* Remove padding to ensure full width and height */
+    position: relative; 
 }
 
-.formLogin{
-    width: 50%;
-    height: 400px;
-    background-color: whitesmoke;
-    box-shadow: 0 4px 7px rgba(48, 50, 51, 0.6); /* Softer shadow */
+.formLogin {
+    width: 600px; 
+    background-color: rgba(255, 255, 255, 0.95); 
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
+    padding: 30px; 
     box-sizing: border-box;
+    position: relative; 
+    z-index: 1; 
 }
 
-.form-group {
-    margin: 15px 0;
+.title {
+    text-align: center;
+    font-size: 24px; 
+    margin-bottom: 20px;
+    color: #007bff; 
 }
 
 .input {
-    background-color: rgb(232, 241, 249);
-    width: 95%;
-    margin-top: 20px;
-    margin-left: 15px;
-    margin-right: 15px;
+    background-color: #f8f9fa; 
+    border: 1px solid #ced4da;
+    width: 100%;
+    padding: 10px; 
+    margin-top: 10px; 
+}
+
+.input:hover,
+.input:focus {
+    border: 1px solid #6af48a;
+    box-shadow: 0 0 4px #94e3a7;
+}
+
+.password-toggle {
+    position: absolute; 
+    right: 10px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+}
+
+.loginBtn {
+    width: 100%; 
+    margin-top: 20px; 
+    background-color:#28a745;
+    color: white;
+    border: none; 
+}
+
+.loginBtn:hover {
+    background-color: #1e7e34; 
+}
+
+.registerBtn{
+    width: 30%; 
+    margin-top: 20px; 
+    background-color:#007bff;
+    color: white;
+    border: none; 
+}
+
+.registerBtn:hover{
+    background-color: #0056b3;
+}
+
+.alert {
+    margin: 10px 0;
+}
+
+.register-contain{
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+}
+
+.register-contain p {
+    margin-right: 10px; 
+    margin-top: 30px;
 }

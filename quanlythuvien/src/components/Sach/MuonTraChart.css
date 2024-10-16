@@ -96,9 +96,41 @@ h6{
 }
 
 .chart{
-    width: 80%;
-    height: 500px;
-    margin: 0 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.category-table {
+    margin: 20px 50px; 
+    width: 100%; 
+    max-width: 1000px; 
+    border-collapse: collapse; 
+}
+
+.table-danhmuc {
+    width: 100%; 
+    border: 1px solid #ddd; 
+}
+
+.table-danhmuc th, .table-danhmuc td {
+    padding: 12px; 
+    text-align: center; 
+    border: 1px solid #ddd; 
+}
+
+.table-danhmuc th {
+    background-color: #f2f2f2; 
+}
+
+.table-danhmuc tr:hover {
+    background-color:rgb(237, 237, 237); 
+}
+.category-title{
+    color:#28a745;
+    text-align: center;
+    font-size: 30px;
     padding: 10px;
 }
+
 

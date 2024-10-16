@@ -20,6 +20,8 @@ const SachDetail = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedLoanSlip, setSelectedLoanSlip] = useState(null);
     const [relatedBooks, setRelatedBooks] = useState([]);
+    // const [stats, setStats] = useState({ borrowed_count: 0, returned_count: 0, late_count: 0 });
+
 
     useEffect(() => {
         const fetchBookDetails = async () => {
@@ -40,8 +42,19 @@ const SachDetail = () => {
             }
         };
 
+        // const fetchStats = async () => {
+        //     try {
+        //         const response = await authApi().get(endpoints.soLanMuonTraQuaHan(id));
+        //         console.log('Statistics response:', response.data); // Kiểm tra dữ liệu trả về
+        //         setStats(response.data);
+        //     } catch (error) {
+        //         console.error('Error fetching book stats:', error);
+        //     }
+        // };
+
         fetchBookDetails();
         fetchCurrentUser();
+        // fetchStats();
     }, [id]);
 
     useEffect(() => {
@@ -59,23 +72,31 @@ const SachDetail = () => {
     useEffect(() => {
         const fetchRelatedBooks = async () => {
             try {
-                const response = await authApi().get(endpoints.sach); // Corrected
+                const response = await authApi().get(endpoints.sach);
                 setRelatedBooks(response.data);
             } catch (error) {
                 console.error('Error fetching related books:', error);
             }
         };
-    
+
         fetchRelatedBooks();
     }, []);
 
-    // Load borrowing status from local storage
+    // Kiểm tra trạng thái mượn sách của người dùng
     useEffect(() => {
         const borrowedStatus = localStorage.getItem(`isBorrowed_${id}`);
         if (borrowedStatus === 'true') {
             setIsBorrowed(true);
         }
-    }, [id]);
+
+        // Kiểm tra xem người dùng có phiếu mượn cho sách hiện tại không
+        if (currentUser && loanSlips.length > 0) {
+            const hasBorrowed = loanSlips.some(slip => 
+                slip.sach === id && slip.userId === currentUser.id
+            );
+            setIsBorrowed(hasBorrowed);
+        }
+    }, [id, currentUser, loanSlips]);
 
     const handleOpenModal = () => {
         setShowModal(true);
@@ -100,7 +121,7 @@ const SachDetail = () => {
             await authApi().post(endpoints.chiTietPhieuMuon, newChiTiet);
             setBorrowSuccess(true);
             setIsBorrowed(true);
-            localStorage.setItem(`isBorrowed_${id}`, 'true'); // Save status in local storage
+            localStorage.setItem(`isBorrowed_${id}`, 'true'); // Lưu trạng thái vào local storage
             handleCloseModal();
         } catch (error) {
             setError('Error creating loan slip detail.');
@@ -119,7 +140,7 @@ const SachDetail = () => {
         try {
             await authApi().post(endpoints.tranTraSach, { sach: id, userId: currentUser.id });
             setIsBorrowed(false);
-            localStorage.removeItem(`isBorrowed_${id}`); // Remove status from local storage
+            localStorage.removeItem(`isBorrowed_${id}`); // Xóa trạng thái khỏi local storage
             alert('Trả sách thành công!');
         } catch (error) {
             setError('Error returning the book.');
@@ -131,6 +152,7 @@ const SachDetail = () => {
         return <p>Loading...</p>;
     }
 
+    const filteredLoanSlips = loanSlips.filter(slip => new Date(slip.ngayTraDuKien) > new Date());
 
     return (
         <>
@@ -147,14 +169,21 @@ const SachDetail = () => {
                         <p><strong>Năm xuất bản: </strong> {book.namXB}</p>
                         <p><strong>Thể loại: </strong> {book.tenDanhMuc}</p>
                         <p><strong>Số lượng còn lại: </strong> {book.soLuong}</p>
+                        {/* <p><strong>Tổng lần mượn: </strong> {stats.borrowed_count}</p>
+                        <p><strong>Tổng lần trả: </strong> {stats.returned_count}</p>
+                        <p><strong>Tổng quá hạn: </strong> {stats.late_count}</p> */}
                     </div>
                     <div className="left-right">
                         <div className="left" onClick={() => navigate('/')}><KeyboardBackspaceIcon /></div>
                     </div>
-                    {isBorrowed ? (
-                        <Button className="add-to-cart bg-secondary">Đã mượn sách</Button>
+                    {book.soLuong > 0 ? (
+                        isBorrowed ? (
+                            <Button className="add-to-cart bg-secondary" onClick={handleReturnBook}>Đã mượn sách</Button>
+                        ) : (
+                            <Button className="add-to-cart" onClick={handleOpenModal}>Mượn sách</Button>
+                        )
                     ) : (
-                        <Button className="add-to-cart" onClick={handleOpenModal}>Mượn sách</Button>
+                        <p className="text"></p> 
                     )}
                 </div>
             </div>
@@ -196,10 +225,9 @@ const SachDetail = () => {
                         <select
                             value={selectedLoanSlipId}
                             onChange={handleLoanSlipChange}
-                            className="loan-slip-select"
-                        >
+                            className="loan-slip-select" >
                             <option value="">Chọn phiếu mượn</option>
-                            {loanSlips.map((slip) => (
+                            {filteredLoanSlips.map((slip) => (
                                 <option key={slip.id} value={slip.id}>
                                     {slip.first_name} {slip.last_name} - {slip.ngayMuon} - {slip.ngayTraDuKien}
                                 </option>

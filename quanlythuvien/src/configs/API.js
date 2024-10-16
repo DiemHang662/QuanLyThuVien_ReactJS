@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://192.168.0.108:8000';
+const BASE_URL = 'http://192.168.1.10:8000';
 
 export const endpoints = {
   nguoidung: '/api/nguoidung/',
@@ -19,9 +19,11 @@ export const endpoints = {
   updateDanhMuc: (id) => `/api/danhmuc/${id}/`,
 
   sach: '/api/sach/',
+  sachMoiCapNhat:'/api/sach/recent-books/',
   sachChiTiet: (id) => `/api/sach/${id}/`,
   sachByDanhMuc: (danhMucId) => `api/sach/${danhMucId}/by-danhmuc/`,
   createSach: '/api/sach/create-sach/',
+  soLanMuonTraQuaHan: (id) => `/api/sach/${id}/so-lan-muon-tra-quahan/`,
   deleteSach: (id) => `/api/sach/${id}/delete-sach/`,
   updateSach: (id) => `/api/sach/${id}/`,
   bookCount:'/api/sach/book-count/',
@@ -49,9 +51,12 @@ export const endpoints = {
   borrowReturnLateStatistics: '/api/sach/borrow-return-late-statistics/',
   likeCount: (id) => `/api/sach/${id}/like-count/`,
   toggle_like: (bookId) => `/api/thich/${bookId}/toggle-like/`,
+  thongKeTheoDanhMuc: '/api/sach/thong-ke-theo-danh-muc/',
   
   binhluan: (bookId) => `api/binhluan/?sach_id=${bookId}`,
   create_comment: (bookId) => `/api/binhluan/${bookId}/create-comment/`,
+
+  share: (id) => `/api/chiase/${id}/share/`,
 
   zalo: 'api/payment/zalopay/order/',
 

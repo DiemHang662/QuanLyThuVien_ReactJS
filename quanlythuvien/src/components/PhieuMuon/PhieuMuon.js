@@ -67,7 +67,6 @@ const PhieuMuon = () => {
             console.error('Error creating borrowing record:', error); // Handle network errors
         }
     };
-    
 
     return (
         <>
@@ -78,11 +77,18 @@ const PhieuMuon = () => {
                     <Form.Group controlId="docGia">
                         <Form.Label>Mã người dùng</Form.Label>
                         <Form.Control
-                            type="text"
-                            value={editPhieuMuon?.docGia || ''}
+                            as="select"
+                            value={editPhieuMuon.docGia}
                             onChange={(e) => setEditPhieuMuon({ ...editPhieuMuon, docGia: e.target.value })}
                             required
-                        />
+                        >
+                            <option value="">Chọn mã người dùng</option>
+                            {docGias.map((docGia) => (
+                                <option key={docGia.id} value={docGia.id}>
+                                    {docGia.id} - {docGia.first_name} {docGia.last_name}
+                                </option>
+                            ))}
+                        </Form.Control>
                         {errors.docGia && <small className="text-danger">{errors.docGia}</small>}
                     </Form.Group>
 
@@ -90,7 +96,7 @@ const PhieuMuon = () => {
                         <Form.Label>Ngày Mượn</Form.Label>
                         <Form.Control
                             type="date"
-                            value={editPhieuMuon?.ngayMuon || ''}
+                            value={editPhieuMuon.ngayMuon}
                             onChange={(e) => setEditPhieuMuon({ ...editPhieuMuon, ngayMuon: e.target.value })}
                             required
                         />
@@ -100,7 +106,7 @@ const PhieuMuon = () => {
                         <Form.Label>Ngày Trả Dự Kiến</Form.Label>
                         <Form.Control
                             type="date"
-                            value={editPhieuMuon?.ngayTraDuKien || ''}
+                            value={editPhieuMuon.ngayTraDuKien}
                             onChange={(e) => setEditPhieuMuon({ ...editPhieuMuon, ngayTraDuKien: e.target.value })}
                             required
                         />
@@ -120,7 +126,7 @@ const PhieuMuon = () => {
                         <ul>
                             {phieuMuons.map((pm, index) => (
                                 <li key={index}>
-                                    <p><strong>Mã độc Giả:</strong> {pm.docGia}</p>
+                                    <p><strong>Mã độc Giả:</strong> {pm.docGia} - {pm.first_name} {pm.last_name}</p>
                                     <p><strong>Ngày Mượn:</strong> {pm.ngayMuon}</p>
                                     <p><strong>Ngày Trả Dự Kiến:</strong> {pm.ngayTraDuKien}</p>
                                 </li>
