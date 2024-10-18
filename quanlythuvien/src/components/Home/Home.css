@@ -286,15 +286,14 @@ h1 {
 .category-item {
   background-color: white;
   border: 1px solid #ccc;
-  padding: 7px;
-  margin: 7px;
+  padding: 5px;
+  margin: 5px;
   cursor: pointer;
   text-align: center;
   transition: transform 0.2s;
-  flex: 0 0 calc(25% - 20px); 
+  flex: 0 0 calc(20% - 20px); 
   box-sizing: border-box; 
   color: black;
-  border-radius: 5px;
 }
 
 .category-item:hover {

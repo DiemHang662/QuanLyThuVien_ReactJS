@@ -52,7 +52,7 @@ export const endpoints = {
   likeCount: (id) => `/api/sach/${id}/like-count/`,
   toggle_like: (bookId) => `/api/thich/${bookId}/toggle-like/`,
   thongKeTheoDanhMuc: '/api/sach/thong-ke-theo-danh-muc/',
-  
+  thongKeTheoDoTuoi: '/api/nguoidung/thong-ke-do-tuoi/',
   binhluan: (bookId) => `api/binhluan/?sach_id=${bookId}`,
   create_comment: (bookId) => `/api/binhluan/${bookId}/create-comment/`,
 

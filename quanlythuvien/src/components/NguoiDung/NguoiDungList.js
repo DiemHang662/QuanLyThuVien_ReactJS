@@ -75,6 +75,7 @@ const NguoiDungList = () => {
                 formData.append('first_name', editUser.first_name);
                 formData.append('last_name', editUser.last_name);
                 formData.append('username', editUser.username);
+                formData.append('nam_sinh', editUser.nam_sinh);
                 formData.append('phone', editUser.phone || '');
                 formData.append('email', editUser.email || '');
                 if (editUser.avatar) {
@@ -156,8 +157,10 @@ const NguoiDungList = () => {
                 <Table bordered hover responsive>
                     <thead>
                         <tr>
+                            <th>STT</th>
                             <th>Ảnh đại diện</th>
                             <th>Họ và tên</th>
+                            <th>Năm sinh</th>
                             <th>Tên tài khoản</th>
                             <th>Số điện thoại</th>
                             <th>Email</th>
@@ -168,10 +171,12 @@ const NguoiDungList = () => {
                     <tbody>
                         {filteredUsers.map(user => (
                             <tr key={user.id}>
+                                <td>{user.id}</td>
                                 <td>
                                     {user.avatar_url && <Image src={user.avatar_url} className="avatar-user" />}
                                 </td>
                                 <td>{user.first_name} {user.last_name}</td>
+                                <td>{user.nam_sinh}</td>
                                 <td>{user.username}</td>
                                 <td>{user.phone || 'Chưa cập nhật'}</td>
                                 <td>{user.email}</td>
@@ -215,78 +220,94 @@ const NguoiDungList = () => {
                 </Table>
 
                 {/* Edit User Modal */}
-                <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+                <Modal show={showEditModal} onHide={() => setShowEditModal(false)} size="lg">
                     <Modal.Header closeButton>
                         <Modal.Title>{editUser?.id ? 'Chỉnh sửa người dùng' : 'Thêm người dùng'}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Form onSubmit={handleEditSubmit}>
-                            <Form.Group controlId="first_name">
-                                <Form.Label>Họ</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={editUser?.first_name || ''}
-                                    onChange={(e) => setEditUser({ ...editUser, first_name: e.target.value })}
-                                    required
-                                />
-                            </Form.Group>
-                            <Form.Group controlId="last_name">
-                                <Form.Label>Tên</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={editUser?.last_name || ''}
-                                    onChange={(e) => setEditUser({ ...editUser, last_name: e.target.value })}
-                                    required
-                                />
-                            </Form.Group>
-                            <Form.Group controlId="username">
-                                <Form.Label>Tên tài khoản</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={editUser?.username || ''}
-                                    onChange={(e) => setEditUser({ ...editUser, username: e.target.value })}
-                                    required
-                                />
-                            </Form.Group>
-                            <Form.Group controlId="phone">
-                                <Form.Label>Số điện thoại</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={editUser?.phone || ''}
-                                    onChange={(e) => setEditUser({ ...editUser, phone: e.target.value })}
-                                />
-                            </Form.Group>
-                            <Form.Group controlId="email">
-                                <Form.Label>Email</Form.Label>
-                                <Form.Control
-                                    type="email"
-                                    value={editUser?.email || ''}
-                                    onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
-                                    required
-                                />
-                            </Form.Group>
-                            <Form.Group controlId="avatar">
-                                <Form.Label>Ảnh đại diện</Form.Label>
-                                <Form.Control
-                                    type="file"
-                                    onChange={(e) => setEditUser({ ...editUser, avatar: e.target.files[0] })}
-                                    accept="image/*"
-                                />
-                                {editUser?.avatar_url && (
-                                    <div>
-                                        <Image src={editUser.avatar_url} className="avatar-preview" thumbnail />
-                                    </div>
-                                )}
-                            </Form.Group>
-
-                            <Form.Group controlId="is_superuser">
-                                <Form.Check
-                                    type="checkbox"
-                                    label="Quản trị viên"
-                                    checked={editUser?.is_superuser || false}
-                                    onChange={(e) => setEditUser({ ...editUser, is_superuser: e.target.checked })}
-                                />
-                            </Form.Group>
+                            <div className="row">
+                                <Form.Group controlId="first_name" className="col-md-6">
+                                    <Form.Label>Họ</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={editUser?.first_name || ''}
+                                        onChange={(e) => setEditUser({ ...editUser, first_name: e.target.value })}
+                                        required
+                                    />
+                                </Form.Group>
+                                <Form.Group controlId="last_name" className="col-md-6">
+                                    <Form.Label>Tên</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={editUser?.last_name || ''}
+                                        onChange={(e) => setEditUser({ ...editUser, last_name: e.target.value })}
+                                        required
+                                    />
+                                </Form.Group>
+                            </div>
+                            <div className="row">
+                                <Form.Group controlId="nam_sinh" className="col-md-6">
+                                    <Form.Label>Năm sinh</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={editUser?.nam_sinh || ''}
+                                        onChange={(e) => setEditUser({ ...editUser, nam_sinh: e.target.value })}
+                                        required
+                                    />
+                                </Form.Group>
+                                <Form.Group controlId="username" className="col-md-6">
+                                    <Form.Label>Tên tài khoản</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={editUser?.username || ''}
+                                        onChange={(e) => setEditUser({ ...editUser, username: e.target.value })}
+                                        required
+                                    />
+                                </Form.Group>
+                            </div>
+                            <div className="row">
+                                <Form.Group controlId="phone" className="col-md-6">
+                                    <Form.Label>Số điện thoại</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={editUser?.phone || ''}
+                                        onChange={(e) => setEditUser({ ...editUser, phone: e.target.value })}
+                                    />
+                                </Form.Group>
+                                <Form.Group controlId="email" className="col-md-6">
+                                    <Form.Label>Email</Form.Label>
+                                    <Form.Control
+                                        type="email"
+                                        value={editUser?.email || ''}
+                                        onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
+                                        required
+                                    />
+                                </Form.Group>
+                            </div>
+                            <div className="row">
+                                <Form.Group controlId="avatar" className="col-md-6">
+                                    <Form.Label>Ảnh đại diện</Form.Label>
+                                    <Form.Control
+                                        type="file"
+                                        onChange={(e) => setEditUser({ ...editUser, avatar: e.target.files[0] })}
+                                        accept="image/*"
+                                    />
+                                    {editUser?.avatar_url && (
+                                        <div>
+                                            <Image src={editUser.avatar_url} className="avatar-preview avt" thumbnail />
+                                        </div>
+                                    )}
+                                </Form.Group>
+                                <Form.Group controlId="is_superuser" className="col-md-6">
+                                    <Form.Check
+                                        type="checkbox"
+                                        label="Quản trị viên"
+                                        checked={editUser?.is_superuser || false}
+                                        onChange={(e) => setEditUser({ ...editUser, is_superuser: e.target.checked })}
+                                    />
+                                </Form.Group>
+                            </div>
                             <Button type="submit" variant="primary">
                                 Lưu
                             </Button>

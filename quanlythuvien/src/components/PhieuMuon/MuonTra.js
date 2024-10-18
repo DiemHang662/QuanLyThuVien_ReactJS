@@ -111,11 +111,10 @@ const MuonTra = () => {
 
     const filterChiTietPhieuMuons = () => {
         return chiTietPhieuMuons.filter(chiTiet => {
-            const fullName = `${chiTiet.first_name} ${chiTiet.last_name}`.toLowerCase();
-            const loanSlipId = chiTiet.phieuMuon_id.toString();
-            const bookTitle = chiTiet.tenSach.toLowerCase();
+            const fullName = `${chiTiet.first_name || ''} ${chiTiet.last_name || ''}`.toLowerCase();
+            const loanSlipId = chiTiet.phieuMuon_id?.toString() || '';
+            const bookTitle = chiTiet.sach?.tenSach?.toLowerCase() || '';  // Safe access
     
-            // Kiểm tra tình trạng
             const isStatusMatch = selectedStatus === 'all' || 
                 (selectedStatus === 'borrowed' && chiTiet.tinhTrang === 'borrowed') ||
                 (selectedStatus === 'returned' && chiTiet.tinhTrang === 'returned') ||
@@ -127,7 +126,7 @@ const MuonTra = () => {
                     isStatusMatch;
         });
     };
-
+    
     const resetForm = () => {
         setSelectedUserId('');
         setSelectedBookTitle('');

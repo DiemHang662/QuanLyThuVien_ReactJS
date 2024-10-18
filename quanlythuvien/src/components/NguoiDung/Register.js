@@ -9,6 +9,7 @@ const Register = () => {
     const [first_name, setFirstname] = useState('');
     const [last_name, setLastname] = useState('');
     const [username, setUsername] = useState('');
+    const [nam_sinh, setNamSinh] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
     const [avatar, setAvatar] = useState(null); // Initialize as null for file input
@@ -31,6 +32,7 @@ const Register = () => {
             formData.append('first_name', first_name);
             formData.append('last_name', last_name);
             formData.append('username', username);
+            formData.append('nam_sinh', nam_sinh);
             formData.append('phone', phone);
             formData.append('email', email);
             formData.append('password', password);
@@ -88,6 +90,15 @@ const Register = () => {
                                     placeholder="Nhập tên"
                                 />
                             </Form.Group>
+                            <Form.Group>
+                                <Form.Label>Năm sinh</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={nam_sinh}
+                                    onChange={e => setNamSinh(e.target.value)}
+                                    placeholder="Nhập năm sinh"
+                                />
+                                </Form.Group>
                             <Form.Group>
                                 <Form.Label>Số điện thoại</Form.Label>
                                 <Form.Control

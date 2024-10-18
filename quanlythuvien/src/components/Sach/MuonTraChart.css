@@ -133,4 +133,43 @@ h6{
     padding: 10px;
 }
 
+.chart-controls {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    margin: 20px 0; 
+}
+
+.chart-controls h6 {
+    margin: 0 10px; 
+}
+
+.chart-controls select:hover {
+    border: 1px solid dodgerblue;
+}
+
+.chart-controls select {
+    margin: 0 20px; 
+    padding: 10px; 
+    border: 1px solid #ddd; 
+    border-radius: 4px;
+    font-size: 15px;
+}
+
+.table-container {
+    display: flex; 
+    justify-content: space-between;
+    margin-left: 90px;
+}
+
+.table-column {
+    width: 48%;
+}
+
+@media (max-width: 1000px) {
+    .table-column {
+        width: 100%; 
+    }
+}
+
 

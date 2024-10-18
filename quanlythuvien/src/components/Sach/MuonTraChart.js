@@ -30,18 +30,46 @@ const MuonTraChart = () => {
         mostLateBooks: { labels: [], datasets: [] },
     });
     const [pieLoading, setPieLoading] = useState(true);
-    const [categoryStats, setCategoryStats] = useState([]); 
+    const [categoryStats, setCategoryStats] = useState([]);
+    const [ageStatistics, setAgeStatistics] = useState([]);
+    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [borrowedStatistics, setBorrowedStatistics] = useState([]);
+    const half = Math.ceil(borrowedStatistics.length / 2);
+    const firstHalf = borrowedStatistics.slice(0, half);
+    const secondHalf = borrowedStatistics.slice(half);
 
     useEffect(() => {
         const fetchChartData = async () => {
             setLoading(true);
             setError(null);
+            let response;
             try {
-                let response;
-
                 if (chartType === 'mostBorrowed') {
-                    response = await authApi().get(endpoints.mostBorrowed);
-                } else if (chartType === 'mostInteracted') {
+                    response = await authApi().get(`${endpoints.mostBorrowed}?month=${selectedMonth}&year=${selectedYear}`);
+                    const borrowedData = response.data || [];
+
+                    const labels = borrowedData.map(item => item.tenSach);
+                    const borrowCounts = borrowedData.map(item => item.total_borrow_count);
+
+                    setBorrowedStatistics(response.data);
+
+                    setChartData({
+                        labels,
+                        datasets: [
+                            {
+                                label: 'Số lượt mượn',
+                                data: borrowCounts,
+                                backgroundColor: 'rgba(75, 192, 192, 0.3)',
+                                borderColor: 'rgba(75, 192, 192, 0.8)',
+                                borderWidth: 1,
+                                fill: true,
+                                tension: 0.3,
+                            },
+                        ],
+                    });
+                } else if (chartType === 'mostInteracted') // Thống kê số lượt tương tác sách 
+                {
                     const [likedResponse, commentedResponse] = await Promise.all([
                         authApi().get(endpoints.mostLiked),
                         authApi().get(endpoints.mostCommented),
@@ -78,7 +106,43 @@ const MuonTraChart = () => {
                         ],
                     });
                     return;
-                } else if (chartType === 'comparison') {
+                } // Thống kê số người dùng thep độ tuổi
+                else if (chartType === 'ageStatistics') {
+                    response = await authApi().get(endpoints.thongKeTheoDoTuoi);
+                    const data = response?.data || [];
+
+                    const sortedData = data.sort((a, b) => a.age - b.age);
+
+                    const totalUsers = sortedData.reduce((acc, item) => acc + item.count, 0);
+                    const labels = sortedData.map(item => `${item.age}`) || [];
+                    const counts = sortedData.map(item => item.count) || [];
+
+                    const percentages = sortedData.map(item => ((item.count / totalUsers) * 100).toFixed(2));
+
+                    setChartData({
+                        labels,
+                        datasets: [
+                            {
+                                label: 'Số lượng người dùng',
+                                data: counts,
+                                backgroundColor: 'rgba(153, 102, 255, 0.3)',
+                                borderColor: 'rgba(153, 102, 255, 1)',
+                                borderWidth: 1,
+                                fill: true,
+                                tension: 0.3,
+                            },
+                        ],
+                    });
+
+                    setAgeStatistics(sortedData.map((item, index) => ({
+                        age: item.age,
+                        count: item.count,
+                        percentage: percentages[index],
+                    })));
+                    return;
+                }
+                // So sánh mượn trả trễ giữa các tháng
+                else if (chartType === 'comparison') {
                     response = await authApi().get(endpoints.borrowReturnLateStatistics);
                     const data = response?.data || {};
 
@@ -114,6 +178,7 @@ const MuonTraChart = () => {
                         ],
                     });
                     return;
+                    // Thống kê số lượng sách theo danh mục
                 } else if (chartType === 'categoryStatistics') {
                     response = await authApi().get(endpoints.thongKeTheoDanhMuc);
                     const data = response?.data || [];
@@ -124,7 +189,7 @@ const MuonTraChart = () => {
 
                     const labels = data.map(item => item.tenDanhMuc) || [];
                     const counts = data.map(item => item.book_count) || [];
-                    const totalBooks = counts.reduce((acc, count) => acc + count, 0); 
+                    const totalBooks = counts.reduce((acc, count) => acc + count, 0);
 
                     const percentages = counts.map(count => ((count / totalBooks) * 100).toFixed(2));
 
@@ -134,8 +199,8 @@ const MuonTraChart = () => {
                             {
                                 label: 'Số lượng sách',
                                 data: counts,
-                                backgroundColor: 'rgba(255, 99, 132, 0.3)',
-                                borderColor: 'rgba(255, 99, 132, 1)',
+                                backgroundColor: 'rgba(255, 206, 86, 0.3)',
+                                borderColor: 'rgba(255, 206, 86, 1)',
                                 borderWidth: 1,
                                 fill: true,
                                 tension: 0.3,
@@ -182,6 +247,7 @@ const MuonTraChart = () => {
             return data.map(count => (total > 0 ? ((count / total) * 100).toFixed(2) : 0));
         };
 
+        // Thống kê các sách theo từng tình trạng
         const fetchPieChartData = async () => {
             setPieLoading(true);
             try {
@@ -250,7 +316,7 @@ const MuonTraChart = () => {
 
         fetchChartData();
         fetchPieChartData();
-    }, [chartType]);
+    }, [chartType, selectedMonth, selectedYear]);
 
     if (loading) {
         return <div className="loading">Loading...</div>;
@@ -268,7 +334,7 @@ const MuonTraChart = () => {
             },
             title: {
                 display: true,
-                text: 'Biểu đồ quản lý hoạt động về sách của thư viện',
+                text: 'Biểu đồ quản lý các hoạt động của thư viện',
             },
         },
         scales: {
@@ -304,13 +370,74 @@ const MuonTraChart = () => {
                 <h6>Chọn loại thống kê: </h6>
                 <div className="select-container">
                     <select value={chartType} onChange={(e) => setChartType(e.target.value)}>
-                        <option value="mostBorrowed">Thống kê số lần mượn sách</option>
+                        <option value="mostBorrowed">Thống kê số lần mượn sách của tháng</option>
                         <option value="mostInteracted">Thống kê số lượt tương tác</option>
                         <option value="comparison">So sánh mượn/trả/trễ các tháng</option>
                         <option value="mostStatus">Thống kê từng tình trạng sách</option>
                         <option value="categoryStatistics">Thống kê theo danh mục</option>
+                        <option value="ageStatistics">Thống kê số người dùng theo độ tuổi</option>
                     </select>
                 </div>
+
+                {chartType === 'mostBorrowed' && (
+                    <div className="chart-controls">
+                        <h6>Chọn tháng:</h6>
+                        <select value={selectedMonth} onChange={(e) => setSelectedMonth(Number(e.target.value))}>
+                            {Array.from({ length: 12 }, (_, i) => (
+                                <option key={i} value={i + 1}>Tháng {i + 1}</option>
+                            ))}
+                        </select>
+
+                        <h6>Chọn năm:</h6>
+                        <select value={selectedYear} onChange={(e) => setSelectedYear(Number(e.target.value))}>
+                            {Array.from({ length: 5 }, (_, i) => (
+                                <option key={i} value={2020 + i}>{2020 + i}</option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+
+                {chartType === 'mostBorrowed' && (
+                    <div className="category-table">
+                        <h2 className="category-title">SỐ LIỆU MƯỢN SÁCH ( THÁNG {selectedMonth}/{selectedYear} )</h2>
+                        <div className="table-container">
+                            <div className="table-column">
+                                <table className="table-danhmuc">
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Tên sách</th>
+                                            <th>Số lượng mượn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {firstHalf.map((stat, index) => (
+                                            <tr key={index}>
+                                                <td>{index + 1}</td>
+                                                <td>{stat.tenSach}</td>
+                                                <td>{stat.total_borrow_count}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="table-column">
+                                <table className="table-danhmuc">
+
+                                    <tbody>
+                                        {secondHalf.map((stat, index) => (
+                                            <tr key={index + half}>
+                                                <td>{index + half + 1}</td>
+                                                <td>{stat.tenSach}</td>
+                                                <td>{stat.total_borrow_count}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {chartType !== 'mostStatus' && (
                     <div className="chart">
@@ -344,6 +471,31 @@ const MuonTraChart = () => {
                     </div>
                 )}
 
+                {chartType === 'ageStatistics' && (
+                    <div className="category-table">
+                        <div className="category-table">
+                            <h2 className="category-title">NHẬN XÉT</h2>
+                            <table className="table-danhmuc">
+                                <thead>
+                                    <tr>
+                                        <th>Độ tuổi</th>
+                                        <th>Số lượng người dùng</th>
+                                        <th>Tỷ lệ (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {ageStatistics.map((stat, index) => (
+                                        <tr key={index}>
+                                            <td>{stat.age}</td>
+                                            <td>{stat.count}</td>
+                                            <td>{stat.percentage}%</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
 
                 {chartType === 'mostStatus' && (
                     <div className="pie-charts">
@@ -351,7 +503,6 @@ const MuonTraChart = () => {
                             <div className="loading">Loading pie chart...</div>
                         ) : (
                             <>
-                                {/* Pie chart for returned books */}
                                 <div className="pie-chart">
                                     <h2>Biểu đồ số lượng sách được trả</h2>
                                     <Pie options={pieOptions} data={pieChartData.mostReturnedBooks} />
@@ -375,7 +526,6 @@ const MuonTraChart = () => {
                                     </table>
                                 </div>
 
-                                {/* Pie chart for borrowed books */}
                                 <div className="pie-chart">
                                     <h2>Biểu đồ số lượng sách được mượn</h2>
                                     <Pie options={pieOptions} data={pieChartData.mostBorrowedBooks} />
@@ -399,7 +549,6 @@ const MuonTraChart = () => {
                                     </table>
                                 </div>
 
-                                {/* Pie chart for late books */}
                                 <div className="pie-chart">
                                     <h2>Biểu đồ số lượng sách bị trễ</h2>
                                     <Pie options={pieOptions} data={pieChartData.mostLateBooks} />

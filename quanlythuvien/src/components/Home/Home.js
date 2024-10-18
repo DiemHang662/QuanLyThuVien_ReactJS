@@ -61,6 +61,11 @@ const Home = () => {
       tenDanhMuc: "Lập trình",
       iconUrl: "/images/MayTinh.PNG"
     },
+    {
+      id: 9,
+      tenDanhMuc: "Sách giáo khoa",
+      iconUrl: "/images/SachGiaoKhoa.jpg"
+    },
   ];
 
   const api = authApi();
