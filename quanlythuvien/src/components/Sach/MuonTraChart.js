@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Line, Pie } from 'react-chartjs-2';
+import { Chart, Line, Pie } from 'react-chartjs-2';
 import MainLayout from '../../components/Navbar/MainLayout';
 import Footer from '../../components/Footer/Footer';
 import { authApi, endpoints } from '../../configs/API';
@@ -38,6 +38,8 @@ const MuonTraChart = () => {
     const half = Math.ceil(borrowedStatistics.length / 2);
     const firstHalf = borrowedStatistics.slice(0, half);
     const secondHalf = borrowedStatistics.slice(half);
+    const [percentageStatistics, setPercentageStatistics] = useState([]);
+    const [percentageData, setPercentageData] = useState([]);
 
     useEffect(() => {
         const fetchChartData = async () => {
@@ -146,11 +148,36 @@ const MuonTraChart = () => {
                     response = await authApi().get(endpoints.borrowReturnLateStatistics);
                     const data = response?.data || {};
 
+                    // Lấy các giá trị cho biểu đồ
                     const labels = data.monthly_statistics?.map(stat => `${stat.month}/${stat.year}`) || [];
-                    const borrowedCounts = data.monthly_statistics?.map(stat => stat.borrowed) || [];
-                    const returnedCounts = data.monthly_statistics?.map(stat => stat.returned) || [];
-                    const lateCounts = data.monthly_statistics?.map(stat => stat.late) || [];
+                    const borrowedCounts = data.monthly_statistics?.map(stat => stat.borrowed || 0) || [];
+                    const returnedCounts = data.monthly_statistics?.map(stat => stat.returned || 0) || [];
+                    const lateCounts = data.monthly_statistics?.map(stat => stat.late || 0) || [];
 
+                    // Tính tỷ lệ phần trăm cho các tình trạng
+                    const totalCounts = borrowedCounts.map((count, index) => {
+                        const total = count + returnedCounts[index] + lateCounts[index]; // Tổng ba tình trạng
+                        if (total > 0) {
+                            const borrowedPercentage = ((count / total) * 100).toFixed(2);
+                            const returnedPercentage = ((returnedCounts[index] / total) * 100).toFixed(2);
+                            const latePercentage = ((lateCounts[index] / total) * 100).toFixed(2);
+
+                            return {
+                                month: labels[index],
+                                borrowed: borrowedPercentage,
+                                returned: returnedPercentage,
+                                late: latePercentage,
+                            };
+                        }
+                        return {
+                            month: labels[index],
+                            borrowed: 0,
+                            returned: 0,
+                            late: 0,
+                        };
+                    });
+
+                    // Cập nhật dữ liệu biểu đồ
                     setChartData({
                         labels,
                         datasets: [
@@ -177,7 +204,12 @@ const MuonTraChart = () => {
                             },
                         ],
                     });
+
+                    // Cập nhật dữ liệu tỷ lệ phần trăm
+                    setPercentageStatistics(totalCounts);
+
                     return;
+
                     // Thống kê số lượng sách theo danh mục
                 } else if (chartType === 'categoryStatistics') {
                     response = await authApi().get(endpoints.thongKeTheoDanhMuc);
@@ -380,121 +412,168 @@ const MuonTraChart = () => {
                 </div>
 
                 {chartType === 'mostBorrowed' && (
-                    <div className="chart-controls">
-                        <h6>Chọn tháng:</h6>
-                        <select value={selectedMonth} onChange={(e) => setSelectedMonth(Number(e.target.value))}>
-                            {Array.from({ length: 12 }, (_, i) => (
-                                <option key={i} value={i + 1}>Tháng {i + 1}</option>
-                            ))}
-                        </select>
+                    <>
+                        <div className="chart-controls">
+                            <h6>Chọn tháng:</h6>
+                            <select value={selectedMonth} onChange={(e) => setSelectedMonth(Number(e.target.value))}>
+                                {Array.from({ length: 12 }, (_, i) => (
+                                    <option key={i} value={i + 1}>Tháng {i + 1}</option>
+                                ))}
+                            </select>
 
-                        <h6>Chọn năm:</h6>
-                        <select value={selectedYear} onChange={(e) => setSelectedYear(Number(e.target.value))}>
-                            {Array.from({ length: 5 }, (_, i) => (
-                                <option key={i} value={2020 + i}>{2020 + i}</option>
-                            ))}
-                        </select>
-                    </div>
+                            <h6>Chọn năm:</h6>
+                            <select value={selectedYear} onChange={(e) => setSelectedYear(Number(e.target.value))}>
+                                {Array.from({ length: 5 }, (_, i) => (
+                                    <option key={i} value={2020 + i}>{2020 + i}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="category-table">
+                            <div className="chart">
+                                <Line options={options} data={chartData} />
+                            </div>
+                            <h2 className="category-title">SỐ LIỆU MƯỢN SÁCH ( THÁNG {selectedMonth}/{selectedYear} )</h2>
+                            <div className="table-container">
+                                <div className="table-column">
+                                    <table className="table-danhmuc">
+                                        <thead>
+                                            <tr>
+                                                <th>STT</th>
+                                                <th>Tên sách</th>
+                                                <th>Số lượng mượn</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {firstHalf.map((stat, index) => (
+                                                <tr key={index}>
+                                                    <td>{index + 1}</td>
+                                                    <td>{stat.tenSach}</td>
+                                                    <td>{stat.total_borrow_count}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="table-column">
+                                    <table className="table-danhmuc">
+                                        <tbody>
+                                            {secondHalf.map((stat, index) => (
+                                                <tr key={index + half}>
+                                                    <td>{index + half + 1}</td>
+                                                    <td>{stat.tenSach}</td>
+                                                    <td>{stat.total_borrow_count}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </>
                 )}
 
-                {chartType === 'mostBorrowed' && (
-                    <div className="category-table">
-                        <h2 className="category-title">SỐ LIỆU MƯỢN SÁCH ( THÁNG {selectedMonth}/{selectedYear} )</h2>
-                        <div className="table-container">
-                            <div className="table-column">
+                {chartType === 'comparison' && (
+                    <>
+                        <div className="chart">
+                            <Line options={options} data={chartData} />
+                        </div>
+                        {percentageStatistics && percentageStatistics.length > 0 && (
+                            <div className="category-table">
+                                <h2 className="category-title">SO SÁNH TỶ LỆ MƯỢN / TRẢ / TRỄ CÁC THÁNG</h2>
                                 <table className="table-danhmuc">
                                     <thead>
                                         <tr>
-                                            <th>STT</th>
-                                            <th>Tên sách</th>
-                                            <th>Số lượng mượn</th>
+                                            <th>Tháng/Năm</th>
+                                            <th>Tỉ lệ mượn (%)</th>
+                                            <th>Tỉ lệ trả (%)</th>
+                                            <th>Tỉ lệ trễ (%)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {firstHalf.map((stat, index) => (
+                                        {percentageStatistics.map((stat, index) => (
                                             <tr key={index}>
-                                                <td>{index + 1}</td>
-                                                <td>{stat.tenSach}</td>
-                                                <td>{stat.total_borrow_count}</td>
+                                                <td>{stat.month}</td>
+                                                <td>{stat.borrowed}%</td>
+                                                <td>{stat.returned}%</td>
+                                                <td>{stat.late}%</td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
                             </div>
-                            <div className="table-column">
-                                <table className="table-danhmuc">
-
-                                    <tbody>
-                                        {secondHalf.map((stat, index) => (
-                                            <tr key={index + half}>
-                                                <td>{index + half + 1}</td>
-                                                <td>{stat.tenSach}</td>
-                                                <td>{stat.total_borrow_count}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+                        )}
+                    </>
                 )}
 
-                {chartType !== 'mostStatus' && (
+                {chartType === 'mostInteracted' && (
                     <div className="chart">
                         <Line options={options} data={chartData} />
                     </div>
+
                 )}
 
                 {chartType === 'categoryStatistics' && (
-                    <div className="category-table">
+                    <>
                         <div className="category-table">
-                            <h2 className="category-title">NHẬN XÉT</h2>
-                            <table className="table-danhmuc">
-                                <thead>
-                                    <tr>
-                                        <th>Tên danh mục</th>
-                                        <th>Số lượng sách</th>
-                                        <th>%</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {categoryStats.map((stat, index) => (
-                                        <tr key={index}>
-                                            <td>{stat.name}</td>
-                                            <td>{stat.count}</td>
-                                            <td>{stat.percentage}%</td>
+                            <div className="category-table">
+
+                                <div className="chart">
+                                    <Line options={options} data={chartData} />
+                                </div>
+                                <h2 className="category-title">NHẬN XÉT</h2>
+                                <table className="table-danhmuc">
+                                    <thead>
+                                        <tr>
+                                            <th>Tên danh mục</th>
+                                            <th>Số lượng sách</th>
+                                            <th>%</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {categoryStats.map((stat, index) => (
+                                            <tr key={index}>
+                                                <td>{stat.name}</td>
+                                                <td>{stat.count}</td>
+                                                <td>{stat.percentage}%</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
+                    </>
                 )}
 
                 {chartType === 'ageStatistics' && (
-                    <div className="category-table">
-                        <div className="category-table">
-                            <h2 className="category-title">NHẬN XÉT</h2>
-                            <table className="table-danhmuc">
-                                <thead>
-                                    <tr>
-                                        <th>Độ tuổi</th>
-                                        <th>Số lượng người dùng</th>
-                                        <th>Tỷ lệ (%)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {ageStatistics.map((stat, index) => (
-                                        <tr key={index}>
-                                            <td>{stat.age}</td>
-                                            <td>{stat.count}</td>
-                                            <td>{stat.percentage}%</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                    <>
+                        <div className="chart">
+                            <Line options={options} data={chartData} />
                         </div>
-                    </div>
+                        <div className="category-table">
+                            <div className="category-table">
+                                <h2 className="category-title">NHẬN XÉT</h2>
+                                <table className="table-danhmuc">
+                                    <thead>
+                                        <tr>
+                                            <th>Độ tuổi</th>
+                                            <th>Số lượng người dùng</th>
+                                            <th>Tỷ lệ (%)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {ageStatistics.map((stat, index) => (
+                                            <tr key={index}>
+                                                <td>{stat.age}</td>
+                                                <td>{stat.count}</td>
+                                                <td>{stat.percentage}%</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </>
                 )}
 
                 {chartType === 'mostStatus' && (

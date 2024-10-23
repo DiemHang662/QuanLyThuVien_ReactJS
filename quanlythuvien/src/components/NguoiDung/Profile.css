@@ -83,29 +83,21 @@
     background-color: #218838; 
 }
 
-.card-container{
-    width: 97%;
-    margin: 0 7px;
-}
-
-.book-card {
-    width: 200px; 
-    transition: transform 0.3s, box-shadow 0.3s;
-    border-radius: 0;
-}
-
-.book-card:hover {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.book-card img {
+.book-img {
     height: 200px;
     border-radius: 0;
 }
 
+.table-history{
+    font-size: 14px;
+    width: 97%;
+    margin-left: 20px;
+}
+
 .tenSach {
    font-size: 14px;
-   color:red;
+   color: rgb(8, 131, 253) !important;
+   font-weight: 600 !important;
 }
 
 .date{

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { Card, Row, Col, Alert, Button, Modal, Image, Form } from 'react-bootstrap';
 import { authApi, endpoints } from '../../configs/API';
 import CryptoJS from 'crypto-js';
@@ -25,7 +25,6 @@ const Profile = () => {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
     const [selectedBook, setSelectedBook] = useState(null);
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [paymentStatus, setPaymentStatus] = useState({});
     const [oldPassword, setOldPassword] = useState('');
@@ -240,79 +239,89 @@ const Profile = () => {
                 {fetchError && <Alert variant="danger">{fetchError}</Alert>}
                 {updateSuccess && <Alert variant="success">{updateSuccess}</Alert>}
 
-                <Row className="card-container mt-4 justify-content-start">
-                    {borrowedBooks.length > 0 ? (
-                        borrowedBooks.map((book) => (
-                            <Col key={book.id} xs={3} sm={2} md={2} className="mb-3">
-                                <Card className="book-card" style={{ height: '440px' }}>
-                                    {book.anhSach_url && (
-                                        <Card.Img variant="top" src={book.anhSach_url} alt={book.tenSach} />
-                                    )}
-                                    <Card.Body>
-                                        <Card.Title className="tenSach">{book.tenSach}</Card.Title>
-                                        <Card.Text className="date">
-                                            <strong>Ngày mượn:</strong> {book.ngayMuon}
-                                        </Card.Text>
-                                        <Card.Text className="date">
-                                            <strong>Hạn trả:</strong> {book.ngayTraDuKien}
-                                        </Card.Text>
-
-                                        {book.ngayTraThucTe ? (
-                                            <p className="text-success date">
-                                                <CheckIcon /> Đã trả sách ({book.ngayTraThucTe})
-                                            </p>
-                                        ) : (
-                                            <>
-                                                {book.tinhTrang === 'late' && (
-                                                    <p className="text-danger date">Đã quá hạn mượn sách!</p>
-                                                )}
-                                                <Button className="btn-thanhtoan"
-                                                    variant="warning"
-                                                    onClick={() => returnBook(book.id)}
-                                                >
-                                                    Trả sách
-                                                </Button>
-                                            </>
-                                        )}
-
-                                        {book.ngayTraThucTe && book.tinhTrang !== 'returned' && (
-                                            <>
-                                                {book.tienPhat > 0 && (
+                <div class="table-responsive">
+                    <table class="table table-hover table-history">
+                        <thead>
+                            <tr>
+                                <th>Ảnh Sách</th>
+                                <th>Tên Sách</th>
+                                <th>Ngày Mượn</th>
+                                <th>Hạn Trả</th>
+                                <th>Trạng Thái</th>
+                                <th>Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {borrowedBooks.length > 0 ? (
+                                borrowedBooks.map((book) => (
+                                    <tr key={book.id}>
+                                        <td>
+                                            {book.anhSach_url && (
+                                                <img src={book.anhSach_url} alt={book.tenSach} className="book-img" />
+                                            )}
+                                        </td>
+                                        <td className="tenSach">{book.tenSach}</td>
+                                        <td>{book.ngayMuon}</td>
+                                        <td>{book.ngayTraDuKien}</td>
+                                        <td>
+                                            {book.ngayTraThucTe ? (
+                                                <p className="text-success">
+                                                    <CheckIcon /> Đã trả ({book.ngayTraThucTe})
+                                                </p>
+                                            ) : (
+                                                <>
+                                                    {book.tinhTrang === 'late' && (
+                                                        <p className="text-danger">Đã quá hạn mượn sách!</p>
+                                                    )}
+                                                </>
+                                            )}
+                                        </td>
+                                        <td>
+                                            {book.ngayTraThucTe ? (
+                                                book.tinhTrang !== 'returned' && book.tienPhat > 0 && (
                                                     <>
                                                         {paymentStatus[book.id] ? (
-                                                            <p className="text-success date">
-                                                                <CheckIcon /> Đã trả tiền phạt: {book.tienPhat} VNĐ
+                                                            <p className="text-success">
+                                                                <i className="bi bi-check"></i> Đã trả tiền phạt: {book.tienPhat} VNĐ
                                                             </p>
                                                         ) : (
                                                             <>
-                                                                <strong>
-                                                                    <p className="bg-warning text-light date">
-                                                                        Phí phạt: {book.tienPhat} VND
-                                                                    </p>
-                                                                </strong>
-                                                                <Button variant="success" className="btn-thanhtoan" onClick={() => {
-                                                                    openPaymentModal(book);
-                                                                    handlePaymentSuccess(book.id); 
-                                                                }}>
+                                                                <p className="bg-warning text-light">
+                                                                    Phí phạt: {book.tienPhat} VND
+                                                                </p>
+                                                                <button
+                                                                    className="btn btn-success btn-thanhtoan"
+                                                                    onClick={() => {
+                                                                        openPaymentModal(book);
+                                                                        handlePaymentSuccess(book.id);
+                                                                    }}
+                                                                >
                                                                     Thanh toán tiền phạt
-                                                                </Button>
+                                                                </button>
                                                             </>
                                                         )}
                                                     </>
-                                                )}
-                                            </>
-                                        )}
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                        ))
-                    ) : (
-                        <Col>
-                            <p>Không có sách đã mượn.</p>
-                        </Col>
-                    )}
-                </Row>
-       
+                                                )
+                                            ) : (
+                                                <button
+                                                    className="btn btn-warning btn-thanhtoan"
+                                                    onClick={() => returnBook(book.id)}
+                                                >
+                                                    Trả sách
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="6">Không có sách đã mượn.</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
                 <Modal show={showPaymentModal} onHide={handleCloseModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>Chọn phương thức thanh toán</Modal.Title>

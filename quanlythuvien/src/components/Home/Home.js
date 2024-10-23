@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-scroll';
 import { Carousel, Button, Form, ListGroup, Dropdown } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
@@ -9,9 +9,19 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import CommentIcon from '@mui/icons-material/Comment';
 import ShareIcon from '@mui/icons-material/Share';
 import SendIcon from '@mui/icons-material/Send';
+import GroupIcon from '@mui/icons-material/Group';
+import BookIcon from '@mui/icons-material/Book';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import CachedIcon from '@mui/icons-material/Cached';
+import PostAddIcon from '@mui/icons-material/PostAdd';
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import LogoutIcon from '@mui/icons-material/Logout';
 import './Home.css';
 import { authApi, endpoints } from '../../configs/API';
 import MainLayout from '../Navbar/MainLayout';
+import { MyUserContext, MyDispatchContext } from '../../configs/Contexts';
 
 const Home = () => {
   const images = [
@@ -84,6 +94,8 @@ const Home = () => {
   const [likeCounts, setLikeCounts] = useState({});
   const [mostLikedBooks, setMostLikedBooks] = useState([]);
   const bookListRef = useRef(null);
+  const user = useContext(MyUserContext);
+  const dispatch = useContext(MyDispatchContext);
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -111,6 +123,7 @@ const Home = () => {
         console.error('Lỗi khi gọi API sách:', error);
       }
     };
+
 
     const fetchCategories = async () => {
       try {
@@ -245,6 +258,12 @@ const Home = () => {
     }
   };
 
+  const handleLogout = () => {
+    dispatch({ type: 'logout' });
+    navigate('/login');
+  };
+
+
   const handleShare = async (bookId, userMessage) => {
     const book = books.find(b => b.id === bookId);
     if (book) {
@@ -268,19 +287,56 @@ const Home = () => {
       <div className="container-home">
         <MainLayout onCategoryChange={handleCategoryChange} />
         <div className="content-wrapper">
-          <div className="sidebar">
-            <h4 className="title-sidebar">Thể loại</h4>
-            <ListGroup>
-              {categories.map((category) => (
-                <ListGroup.Item
-                  key={category.id}
-                  onClick={() => handleCategoryChange(category.id)}
-                  className="list-group-item" // Ensure this class is applied
-                >
-                  {category.tenDanhMuc}
-                </ListGroup.Item>
-              ))}
-            </ListGroup>
+          <div class="d-flex">
+            <aside className="sidebar">
+              <div className="sidebar-menu">
+                {user &&
+                  <div className="sidebar-item" onClick={() => navigate('/profile')}>
+                    <img src={user.avatar_url} alt="Avatar" className="anhDaiDien" />
+                    <strong><p>{user.first_name} {user.last_name}</p></strong>
+                  </div>
+                }
+
+                {user && user.is_superuser ? (
+                  <>
+                    <div className="sidebar-item" onClick={() => navigate('/nguoidung')}>
+                      <GroupIcon /> <span>Người dùng</span>
+                    </div>
+                    <div className="sidebar-item" onClick={() => navigate('/dssach')}>
+                      <BookIcon /> <span>Sách</span>
+                    </div>
+                    <div className="sidebar-item" onClick={() => navigate('/phieumuon')}>
+                      <HistoryEduIcon /> <span>Lập phiếu mượn</span>
+                    </div>
+                    <div className="sidebar-item" onClick={() => navigate('/muontra')}>
+                      <CachedIcon /> <span>Mượn trả sách</span>
+                    </div>
+                    <div className="sidebar-item" onClick={() => navigate('/bctk')}>
+                      <BarChartIcon /> <span>Thống kê</span>
+                    </div>
+                    <div className="sidebar-item" onClick={() => navigate('/dangki')}>
+                      <GroupAddIcon /> <span>Đăng ký</span>
+                    </div>
+                    <div className="border"></div>
+                    <Button variant="danger" className="mb-2 btn-out" onClick={handleLogout}><LogoutIcon /> Đăng xuất</Button>
+                  </>
+                ) : (
+                  <>
+                    <div className="sidebar-item" onClick={() => navigate('/dkphieumuon')}>
+                      <PostAddIcon /> <span>Đăng ký phiếu mượn</span>
+                    </div>
+                    <div className="sidebar-item" onClick={() => navigate('/dangki')}>
+                      <GroupAddIcon /> <span>Đăng ký</span>
+                    </div>
+                    <div className="sidebar-item" onClick={() => navigate('/profile')}>
+                      <AutoStoriesIcon /> <span> Sách của bạn</span>
+                    </div>
+                    <div className="border"></div>
+                    <Button variant="danger" className="mb-2 btn-out" onClick={handleLogout}><LogoutIcon /> Đăng xuất</Button>
+                  </>
+                )}
+              </div>
+            </aside>
           </div>
 
           <div className="book-list">
@@ -325,7 +381,6 @@ const Home = () => {
                 </div>
               </div>
 
-
               <div className="title-border">
                 <div className="title-recent">
                   <p>SÁCH MỚI CẬP NHẬT</p>
@@ -347,6 +402,7 @@ const Home = () => {
                 )}
               </div>
             </div>
+
 
 
             <div className="title-border">

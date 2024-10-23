@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Form, Table, ButtonGroup, Image, Modal } from 'react-bootstrap';
 import MainLayout from '../../components/Navbar/MainLayout';
 import Footer from '../../components/Footer/Footer';
-import { authApi, endpoints } from '../../configs/API';  // Adjust API config paths accordingly
+import { authApi, endpoints } from '../../configs/API';  
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';

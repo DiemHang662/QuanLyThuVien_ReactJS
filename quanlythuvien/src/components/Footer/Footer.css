@@ -1,32 +1,65 @@
-.text-white {
-    color: #fff;
-  }
-  
-  a {
-    text-decoration: none;
-    color: #fff; /* Màu chữ của liên kết mặc định */
-  }
-  
-  a:hover {
-    color: #4CAF50; /* Màu chữ khi hover */
-  }
-  
-  .footer img {
-    max-width: 100%;
-    height: auto;
-  }
-  
-  .list-unstyled {
-    padding: 0;
-    margin: 0;
-  }
-  
-  .list-unstyled li {
-    margin-bottom: 0.5rem;
-  }
-  
-  .map-container {
-    margin-top: 1rem;
-    overflow: hidden;
-  }
-  
+.social-icons {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.social-icons a:hover {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+}
+
+.tweet-container p {
+  margin-bottom: 0.5rem;
+}
+
+.course-container a {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.course-container img {
+  width: 50px;
+  height: 50px;
+  margin-right: 5px;
+}
+
+.course-container img:hover {
+  background-color: black;
+  opacity: 0.6;
+}
+
+.contact-container p {
+  margin-bottom: 0.5rem;
+}
+
+.copyright {
+  background-color: black;
+}
+
+.text-footer{
+  text-transform: uppercase;
+  color:#49f94f ;
+  font-weight: 500;
+}
+
+.border-footer{
+  border-bottom: 1px solid #4CAF50;
+  margin-bottom: 10px;
+}
+
+.about-us{
+  font-size: 13px;
+}
+
+.tinhnang{
+  color: white;
+  font-size: 13px;
+}
+
+.tinhnang:hover{
+  background-color: #4CAF50;
+}
+

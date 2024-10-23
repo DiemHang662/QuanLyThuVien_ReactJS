@@ -6,6 +6,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SpeedIcon from '@mui/icons-material/Speed';
 import PersonIcon from '@mui/icons-material/Person';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
+import TelegramIcon from '@mui/icons-material/Telegram';
 import { MyUserContext, MyDispatchContext } from '../../configs/Contexts';
 import { useNavigate } from 'react-router-dom';
 import { authApi, endpoints } from '../../configs/API';
@@ -47,9 +48,8 @@ const MainLayout = ({ children, searchTerm, setSearchTerm, onSearch }) => {
 
   return (
     <div>
-      {/* Sidebar has been removed for brevity */}
 
-      <div className="content-wrapper">
+      <div className="content">
         <Navbar className="navbar-custom bg-white shadow-sm" expand="lg">
           <Container fluid>
             <Navbar.Brand as={Link} to="/" className="brand text-brand me-4">
@@ -69,30 +69,14 @@ const MainLayout = ({ children, searchTerm, setSearchTerm, onSearch }) => {
                     <Nav.Link as={Link} to="/tongquan"><SpeedIcon /> Tổng quan</Nav.Link>
                     <Nav.Link as={Link} to="/"><HomeIcon /> Trang chủ</Nav.Link>
                     <Nav.Link as={Link} to="/tintuc"><NewspaperIcon /> Tin tức</Nav.Link>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="light" id="dropdown-basic"></Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item as={Link} to="/nguoidung">Người dùng</Dropdown.Item>
-                        <Dropdown.Item as={Link} to="/dssach">Sách</Dropdown.Item>
-                        <Dropdown.Item as={Link} to="/muontra">Mượn trả sách</Dropdown.Item>
-                        <Dropdown.Item as={Link} to="/phieumuon">Lập phiếu mượn</Dropdown.Item>
-                        <Dropdown.Item as={Link} to="/dangki">Đăng ký</Dropdown.Item>
-                        <Dropdown.Item as={Link} to="/bctk">Báo cáo thống kê</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
+                    <Nav.Link as={Link} to="/lienhe"><TelegramIcon /> Liên hệ</Nav.Link>
                   </>
                 )}
                 {user && !user.is_superuser && (
                   <>
                     <Nav.Link as={Link} to="/"><HomeIcon /> Trang chủ</Nav.Link>
                     <Nav.Link as={Link} to="/tintuc"><NewspaperIcon /> Tin tức</Nav.Link>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="light" id="dropdown-basic">Khác</Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item as={Link} to="/dkiphieumuon">Đăng ký thông tin mượn sách</Dropdown.Item>
-                        <Dropdown.Item as={Link} to="/dangki">Đăng ký</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
+                    <Nav.Link as={Link} to="/lienhe"><TelegramIcon /> Liên hệ</Nav.Link>
                   </>
                 )}
               </Nav>
@@ -120,9 +104,8 @@ const MainLayout = ({ children, searchTerm, setSearchTerm, onSearch }) => {
           </Container>
         </Navbar>
 
-        <div className="content-area">
           {children}
-        </div>
+
       </div>
     </div>
   );

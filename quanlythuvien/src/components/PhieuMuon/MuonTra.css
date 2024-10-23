@@ -27,9 +27,10 @@
 
 .search-ctpm {
     margin: 15px 60px;
-    width: 87%;
+    width: 90%;
     border-radius: 20px;
     padding: 10px;
+    background-color: #ffffff;
 }
 
 .form1-container {
@@ -63,11 +64,19 @@
 }
 
 .status-filter {
-    margin: 20px 400px;
+    margin: 20px 250px;
     text-align: center;
     align-items: center;
 }
 
 .status-filter .form-check {
-    margin-right: 10px;
+    margin-right: 20px;
+}
+
+.status-filter .form-select {
+    background-color: #ffffff;
+    margin-right: 20px;
+    width: 90px;
+    font-size: 11px;
+    height: 40px;
 }

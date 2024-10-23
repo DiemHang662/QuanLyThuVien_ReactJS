@@ -259,6 +259,10 @@ h1 {
   flex-wrap: wrap;
 }
 
+.bg1{
+  background-color: antiquewhite;
+}
+
 .sidebar .list-group-item {
   cursor: pointer;
   transition: box-shadow 0.3s;
@@ -303,4 +307,61 @@ h1 {
 .category-icon {
   width: 60px; 
   height: 50px; 
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #f8f9fa;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  overflow-y: auto;
+}
+
+.sidebar-menu {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar-item {
+  margin-bottom: 10px;
+  padding: 10px;
+  width: 100%;
+  text-align: left;
+}
+
+.sidebar-item:hover {
+  background-color: #e2e6ea;
+  color:#4CAF50;
+}
+
+.sidebar-item i {
+  margin-right: 10px;
+}
+
+.content-area {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.anhDaiDien{
+  width: 80px;
+  height: 80px;
+}
+
+p{
+  margin-top: 10px;
+}
+
+.sidebar-item:first-child {
+  border-bottom: 2px solid #4CAF50;
+  text-align: center;
+}
+
+.border{
+  border-bottom: 1px solid #ececec;
+}
+
+.btn-out{
+  margin-top: 30px;
 }

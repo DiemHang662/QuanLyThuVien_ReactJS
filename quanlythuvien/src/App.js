@@ -13,6 +13,7 @@ import PhieuMuonList from './components/PhieuMuon/PhieuMuonList';
 import PhieuMuon from './components/PhieuMuon/PhieuMuon';
 import MuonTra from './components/PhieuMuon/MuonTra';
 import TinTuc from './components/TinTuc/TinTuc';
+import LienHe from './components/LienHe/LienHe';
 import './App.css';
 import { MyUserContext } from './configs/Contexts';
 import MainLayout from './components/Navbar/MainLayout';
@@ -30,7 +31,7 @@ function App() {
           <Route path="/nguoidung" element={user ? <NguoiDungList /> : <Navigate to="/login" />} />
           <Route path="/dangki" element={<Register />} />
           <Route path="/danhmuc" element={user ? <MainLayout /> : <Navigate to="/login" />} />
-          <Route path="/sach" element={<Home /> } />
+          <Route path="/sach" element={user ? <Home /> : <Navigate to="/login"  /> } />
           <Route path="/sach/:id" element={user ? <SachDetail /> : <Navigate to="/login" />} />
           <Route path="/dssach" element={user ? <SachList /> : <Navigate to="/login" />} />
           <Route path="/bctk" element={user ? <MuonTraChart /> : <Navigate to="/login" />} />
@@ -40,6 +41,7 @@ function App() {
           <Route path="/login" element={<Login />} /> 
           <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
           <Route path="/tintuc" element={<TinTuc />} />
+          <Route path="/lienhe" element={<LienHe />} />
         </Routes>
       </div>
       <ChatBot />

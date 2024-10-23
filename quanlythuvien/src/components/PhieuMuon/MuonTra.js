@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table, Modal, Form, Alert} from 'react-bootstrap';
+import { Button, Table, Modal, Form, Alert } from 'react-bootstrap';
 import { authApi, endpoints } from '../../configs/API';
 import MainLayout from '../../components/Navbar/MainLayout';
 import Footer from '../../components/Footer/Footer';
@@ -7,6 +7,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import InfoIcon from '@mui/icons-material/Info';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
 import './MuonTra.css';
 
 const MuonTra = () => {
@@ -27,6 +28,8 @@ const MuonTra = () => {
     const [fetchError, setFetchError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [filterMonth, setFilterMonth] = useState('');
+    const [filterYear, setFilterYear] = useState('');
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
@@ -109,24 +112,73 @@ const MuonTra = () => {
         }
     };
 
+    // const filterChiTietPhieuMuons = () => {
+    //     return chiTietPhieuMuons.filter(chiTiet => {
+    //         const fullName = `${chiTiet.first_name || ''} ${chiTiet.last_name || ''}`.toLowerCase();
+    //         const loanSlipId = chiTiet.phieuMuon_id?.toString() || '';
+    //         const bookTitle = chiTiet.sach?.tenSach?.toLowerCase() || '';  
+
+    //         const isStatusMatch = selectedStatus === 'all' || 
+    //             (selectedStatus === 'borrowed' && chiTiet.tinhTrang === 'borrowed') ||
+    //             (selectedStatus === 'returned' && chiTiet.tinhTrang === 'returned') ||
+    //             (selectedStatus === 'late' && chiTiet.tinhTrang === 'late');
+
+    //         return (fullName.includes(searchTerm.toLowerCase()) ||
+    //                 loanSlipId.includes(searchTerm) ||
+    //                 bookTitle.includes(searchTerm)) && 
+    //                 isStatusMatch;
+    //     });
+    // };
+
     const filterChiTietPhieuMuons = () => {
         return chiTietPhieuMuons.filter(chiTiet => {
             const fullName = `${chiTiet.first_name || ''} ${chiTiet.last_name || ''}`.toLowerCase();
             const loanSlipId = chiTiet.phieuMuon_id?.toString() || '';
-            const bookTitle = chiTiet.sach?.tenSach?.toLowerCase() || '';  // Safe access
-    
-            const isStatusMatch = selectedStatus === 'all' || 
+            const bookTitle = chiTiet.sach?.tenSach?.toLowerCase() || '';
+
+            // Match tinhTrang based on selectedStatus (borrowed, returned, late, or all)
+            const isStatusMatch = selectedStatus === 'all' ||
                 (selectedStatus === 'borrowed' && chiTiet.tinhTrang === 'borrowed') ||
                 (selectedStatus === 'returned' && chiTiet.tinhTrang === 'returned') ||
                 (selectedStatus === 'late' && chiTiet.tinhTrang === 'late');
-    
-            return (fullName.includes(searchTerm.toLowerCase()) ||
+
+            // Get month and year from the ngayMuon or ngayTraThucTe field
+            const ngayMuon = new Date(chiTiet.phieuMuon?.ngayMuon);
+            const ngayTraThucTe = chiTiet.ngayTraThucTe ? new Date(chiTiet.ngayTraThucTe) : null;
+
+            // Match month and year if provided (from ngayMuon or ngayTraThucTe based on tinhTrang)
+            const isDateMatch = (() => {
+                const selectedMonth = parseInt(filterMonth, 10);  // Assume filterMonth is a string like "7" for July
+                const selectedYear = parseInt(filterYear, 10);    // Assume filterYear is a string like "2024"
+
+                // If no month/year is selected, it's a match (i.e., don't filter by date)
+                if (!filterMonth || !filterYear) return true;
+
+                // If status is borrowed, match based on ngayMuon
+                if (chiTiet.tinhTrang === 'borrowed' && ngayMuon) {
+                    return ngayMuon.getMonth() + 1 === selectedMonth && ngayMuon.getFullYear() === selectedYear;
+                }
+
+                // If status is returned or late, match based on ngayTraThucTe
+                if (['returned', 'late'].includes(chiTiet.tinhTrang) && ngayTraThucTe) {
+                    return ngayTraThucTe.getMonth() + 1 === selectedMonth && ngayTraThucTe.getFullYear() === selectedYear;
+                }
+
+                return false;  // Default if no conditions match
+            })();
+
+            // Final filter condition (combines search term, status, and date filter)
+            return (
+                (fullName.includes(searchTerm.toLowerCase()) ||
                     loanSlipId.includes(searchTerm) ||
-                    bookTitle.includes(searchTerm)) && 
-                    isStatusMatch;
+                    bookTitle.includes(searchTerm)) &&
+                isStatusMatch &&
+                isDateMatch
+            );
         });
     };
-    
+
+
     const resetForm = () => {
         setSelectedUserId('');
         setSelectedBookTitle('');
@@ -134,7 +186,7 @@ const MuonTra = () => {
         setSearchTerm(''); // Đặt lại trường tìm kiếm
         setSelectedStatus('all'); // Đặt lại tình trạng về "Tất cả"
     };
-    
+
     const handleErrors = (error) => {
         if (error.response && error.response.data) {
             setErrors(error.response.data);
@@ -143,64 +195,118 @@ const MuonTra = () => {
             console.error('Error:', error.message);
         }
     };
-    
+
     return (
         <>
             <MainLayout />
-    
-            {fetchError && <Alert variant="danger">{fetchError}</Alert>}
-    
-            <h1 className="title-list">Danh Sách Chi Tiết Phiếu Mượn</h1>
-    
-             <div className="status-filter">
-            <div className="d-flex flex-wrap">
-                <Form.Check
-                    type="radio"
-                    label="Tất cả"
-                    name="status"
-                    value="all"
-                    checked={selectedStatus === 'all'}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    className="me-4"
-                />
-                <Form.Check
-                    type="radio"
-                    label="Đang mượn"
-                    name="status"
-                    value="borrowed"
-                    checked={selectedStatus === 'borrowed'}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    className="me-4"
-                />
-                <Form.Check
-                    type="radio"
-                    label="Đã trả"
-                    name="status"
-                    value="returned"
-                    checked={selectedStatus === 'returned'}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    className="me-4"
-                />
-                <Form.Check
-                    type="radio"
-                    label="Quá hạn"
-                    name="status"
-                    value="late"
-                    checked={selectedStatus === 'late'}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    className="me-4"
-                />
-            </div>
-        </div>
 
-        <Form.Group controlId="search">
-            <Form.Control className="search-ctpm"
-                type="text"
-                placeholder="Nhập tên độc giả, mã phiếu mượn..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
-        </Form.Group>
+            {fetchError && <Alert variant="danger">{fetchError}</Alert>}
+
+            <h1 className="title-list">Danh Sách Chi Tiết Phiếu Mượn</h1>
+
+            <div className="status-filter">
+                <div className="d-flex flex-wrap align-items-center">
+                    {/* Radio buttons for status filter */}
+                    <Form.Check
+                        type="radio"
+                        label="Tất cả"
+                        name="status"
+                        value="all"
+                        checked={selectedStatus === 'all'}
+                        onChange={(e) => setSelectedStatus(e.target.value)}
+                        className="me-4"
+                    />
+                    <Form.Check
+                        type="radio"
+                        label="Đang mượn"
+                        name="status"
+                        value="borrowed"
+                        checked={selectedStatus === 'borrowed'}
+                        onChange={(e) => setSelectedStatus(e.target.value)}
+                        className="me-4"
+                    />
+                    <Form.Check
+                        type="radio"
+                        label="Đã trả"
+                        name="status"
+                        value="returned"
+                        checked={selectedStatus === 'returned'}
+                        onChange={(e) => setSelectedStatus(e.target.value)}
+                        className="me-4"
+                    />
+                    <Form.Check
+                        type="radio"
+                        label="Quá hạn"
+                        name="status"
+                        value="late"
+                        checked={selectedStatus === 'late'}
+                        onChange={(e) => setSelectedStatus(e.target.value)}
+                        className="me-4"
+                    />
+
+                    <Form.Group className="me-1 mb-0">
+                        <InsertInvitationIcon />
+                    </Form.Group>
+
+                    <Form.Group className="me-4 mb-0">
+                        <Form.Control
+                            id="filterMonth"
+                            as="select"
+                            value={filterMonth}
+                            onChange={(e) => setFilterMonth(e.target.value)}
+                            className="form-select"
+                            required
+                        >
+                            <option value="">Tháng</option>
+                            <option value="1">Tháng 1</option>
+                            <option value="2">Tháng 2</option>
+                            <option value="3">Tháng 3</option>
+                            <option value="4">Tháng 4</option>
+                            <option value="5">Tháng 5</option>
+                            <option value="6">Tháng 6</option>
+                            <option value="7">Tháng 7</option>
+                            <option value="8">Tháng 8</option>
+                            <option value="9">Tháng 9</option>
+                            <option value="10">Tháng 10</option>
+                            <option value="11">Tháng 11</option>
+                            <option value="12">Tháng 12</option>
+                        </Form.Control>
+                    </Form.Group>
+
+                    <Form.Group className=" me-1 mb-0">
+                        <InsertInvitationIcon />
+                    </Form.Group>
+
+                    <Form.Group className="mb-0">
+                        <Form.Control
+                            id="filterYear"
+                            as="select"
+                            value={filterYear}
+                            onChange={(e) => setFilterYear(e.target.value)}
+                            className="form-select"
+                            required
+                        >
+                            <option value="">Năm</option>
+                            <option value="2024">2020</option>
+                            <option value="2024">2021</option>
+                            <option value="2024">2022</option>
+                            <option value="2023">2023</option>
+                            <option value="2024">2024</option>
+
+                        </Form.Control>
+                    </Form.Group>
+                </div>
+            </div>
+
+
+            <Form.Group controlId="search">
+                <Form.Control className="search-ctpm"
+                    type="text"
+                    placeholder="Nhập tên độc giả, mã phiếu mượn..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </Form.Group>
 
 
             <div className="form1-container">
