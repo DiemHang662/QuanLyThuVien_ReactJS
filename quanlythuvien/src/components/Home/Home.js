@@ -322,7 +322,7 @@ const Home = () => {
                   </>
                 ) : (
                   <>
-                    <div className="sidebar-item" onClick={() => navigate('/dkphieumuon')}>
+                    <div className="sidebar-item" onClick={() => navigate('/dkiphieumuon')}>
                       <PostAddIcon /> <span>Đăng ký phiếu mượn</span>
                     </div>
                     <div className="sidebar-item" onClick={() => navigate('/dangki')}>

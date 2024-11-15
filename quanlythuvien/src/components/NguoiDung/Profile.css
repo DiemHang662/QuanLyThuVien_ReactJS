@@ -59,6 +59,7 @@
 
 .momo {
     background-color: #D82D8B;
+    border: 1px solid #D82D8B ;
 }
 
 .zalo {
@@ -72,7 +73,7 @@
 }
 
 .momo:hover {
-    background-color: #bb2678;
+    background-color: #9e1f65;
 }
 
 .zalo:hover {
@@ -122,3 +123,41 @@
     font-size: 10px;
 }
 
+.sach-info-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+h5{
+    font-size: 17px;
+    margin: 10px 0;
+    text-transform: uppercase;
+    color: dodgerblue;
+    font-weight: 600;
+}
+
+.sach-info {
+    flex: 1; 
+}
+
+.sach-info p{
+    padding: 5px; 
+}
+
+.sach-image {
+    flex: 0 0 auto;
+    text-align: right; 
+}
+
+.sach-image img {
+    width: 200px; 
+    height: 300px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.border-sach-info-container{
+    width: 50%;
+    border-top: 1px solid #f0f0f0;
+}

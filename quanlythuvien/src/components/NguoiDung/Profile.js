@@ -153,6 +153,11 @@ const Profile = () => {
             const payUrl = data.payUrl.trim();
             console.log('Trimmed PayUrl:', payUrl);
             window.open(payUrl, '_blank');
+    
+            // Giả định rằng thanh toán sẽ thành công sau một khoảng thời gian
+            setTimeout(() => {
+                updatePaymentStatus(item.id);  // Cập nhật trạng thái sau khi thanh toán
+            }, 5000);  // Thay đổi thời gian nếu cần
         }
     };
 
@@ -196,6 +201,22 @@ const Profile = () => {
             alert('Có lỗi xảy ra khi tạo đơn hàng Zalo. Vui lòng thử lại sau!');
         }
     };
+
+    const updatePaymentStatus = async (bookId) => {
+    try {
+        await api.patch(endpoints.updateDaTraTienPhat(bookId), {
+            daTraTienPhat: true,
+            tinhTrang: 'paid'
+        });
+
+        // Gọi lại GET để lấy dữ liệu mới nhất
+        const response = await api.get(endpoints.borrowedBooks(currentUser.id));
+        setBorrowedBooks(response.data);  // Cập nhật state với dữ liệu mới
+    } catch (error) {
+        console.error('Error updating payment status:', error);
+        alert('Có lỗi xảy ra khi cập nhật trạng thái thanh toán.');
+    }
+};
 
     return (
         <>
@@ -281,8 +302,8 @@ const Profile = () => {
                                                 book.tinhTrang !== 'returned' && book.tienPhat > 0 && (
                                                     <>
                                                         {paymentStatus[book.id] ? (
-                                                            <p className="text-success">
-                                                                <i className="bi bi-check"></i> Đã trả tiền phạt: {book.tienPhat} VNĐ
+                                                            <p className="text-info">
+                                                                Đã trả phạt: {book.tienPhat} VNĐ
                                                             </p>
                                                         ) : (
                                                             <>

@@ -169,9 +169,6 @@ const SachDetail = () => {
                         <p><strong>Năm xuất bản: </strong> {book.namXB}</p>
                         <p><strong>Thể loại: </strong> {book.tenDanhMuc}</p>
                         <p><strong>Số lượng còn lại: </strong> {book.soLuong}</p>
-                        {/* <p><strong>Tổng lần mượn: </strong> {stats.borrowed_count}</p>
-                        <p><strong>Tổng lần trả: </strong> {stats.returned_count}</p>
-                        <p><strong>Tổng quá hạn: </strong> {stats.late_count}</p> */}
                     </div>
                     <div className="left-right">
                         <div className="left" onClick={() => navigate('/')}><KeyboardBackspaceIcon /></div>

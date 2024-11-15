@@ -70,6 +70,17 @@ const MainLayout = ({ children, searchTerm, setSearchTerm, onSearch }) => {
                     <Nav.Link as={Link} to="/"><HomeIcon /> Trang chủ</Nav.Link>
                     <Nav.Link as={Link} to="/tintuc"><NewspaperIcon /> Tin tức</Nav.Link>
                     <Nav.Link as={Link} to="/lienhe"><TelegramIcon /> Liên hệ</Nav.Link>
+                    <Dropdown>
+                    <Dropdown.Toggle variant="light" id="dropdown-basic"></Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        <Dropdown.Item as={Link} to="dangki">Đăng ký</Dropdown.Item>
+                        <Dropdown.Item as={Link} to="/nguoidung">Người dùng</Dropdown.Item>
+                        <Dropdown.Item as={Link} to="/dssach">Sách</Dropdown.Item>
+                        <Dropdown.Item as={Link} to="/phieumuon">Lập phiếu mượn</Dropdown.Item>
+                        <Dropdown.Item as={Link} to="/muontra">Mượn trả sách</Dropdown.Item>
+                        <Dropdown.Item as={Link} to="/bctk">Thống kê</Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
                   </>
                 )}
                 {user && !user.is_superuser && (

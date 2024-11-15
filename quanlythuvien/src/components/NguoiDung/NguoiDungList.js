@@ -182,13 +182,13 @@ const NguoiDungList = () => {
                                 <td>{user.email}</td>
                                 <td>{user.is_superuser ? 'Nhân viên' : 'Độc giả'}</td>
                                 <td className="action-buttons">
-                                    <Button
+                                    {/* <Button
                                         variant="primary"
                                         className="user-button-primary"
                                         onClick={() => navigate(`/nguoidung/${user.id}`)}
                                     >
                                         <KeyboardDoubleArrowRightIcon />
-                                    </Button>
+                                    </Button> */}
                                     <Button
                                         variant="danger"
                                         className="user-button-danger"

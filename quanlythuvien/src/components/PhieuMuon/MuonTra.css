@@ -1,6 +1,7 @@
 .table-chi-tiet {
     width: 98%;
     margin: 15px 10px;
+    font-size: 14px;
 }
 
 .title-list {
@@ -64,19 +65,22 @@
 }
 
 .status-filter {
-    margin: 20px 250px;
+    margin: 20px 200px;
     text-align: center;
     align-items: center;
 }
 
 .status-filter .form-check {
-    margin-right: 20px;
+    margin-right: 5px;
 }
 
 .status-filter .form-select {
     background-color: #ffffff;
-    margin-right: 20px;
+    margin-right: 10px;
     width: 90px;
     font-size: 11px;
     height: 40px;
 }
+
+
+

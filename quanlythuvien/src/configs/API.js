@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://192.168.1.8:8000';
+const BASE_URL = 'http://192.168.1.9:8000';
 
 export const endpoints = {
   nguoidung: '/api/nguoidung/',
@@ -27,6 +27,7 @@ export const endpoints = {
   deleteSach: (id) => `/api/sach/${id}/delete-sach/`,
   updateSach: (id) => `/api/sach/${id}/`,
   bookCount:'/api/sach/book-count/',
+  locSach: '/api/sach/filter-books/',
 
   phieuMuon: '/api/phieumuon/',
   createPhieuMuon: '/api/phieumuon/create-phieumuon/',
@@ -37,6 +38,7 @@ export const endpoints = {
   createChiTietPhieuMuon: '/api/chitietphieumuon/',
   deleteChiTietPhieuMuon: (id) => `/api/chitietphieumuon/${id}/`,
   updateChiTietPhieuMuon: (id) => `/api/chitietphieumuon/${id}/`,
+  updateDaTraTienPhat: (id) => `/api/chitietphieumuon/${id}/update-da-tra-tien-phat/`,
 
   borrowedBooks: (id) => `/api/nguoidung/${id}/borrowed-books/`,
 

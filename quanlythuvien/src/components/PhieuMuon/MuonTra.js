@@ -7,6 +7,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import InfoIcon from '@mui/icons-material/Info';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ClearIcon from '@mui/icons-material/Clear';
 import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
 import './MuonTra.css';
 
@@ -112,23 +113,6 @@ const MuonTra = () => {
         }
     };
 
-    // const filterChiTietPhieuMuons = () => {
-    //     return chiTietPhieuMuons.filter(chiTiet => {
-    //         const fullName = `${chiTiet.first_name || ''} ${chiTiet.last_name || ''}`.toLowerCase();
-    //         const loanSlipId = chiTiet.phieuMuon_id?.toString() || '';
-    //         const bookTitle = chiTiet.sach?.tenSach?.toLowerCase() || '';  
-
-    //         const isStatusMatch = selectedStatus === 'all' || 
-    //             (selectedStatus === 'borrowed' && chiTiet.tinhTrang === 'borrowed') ||
-    //             (selectedStatus === 'returned' && chiTiet.tinhTrang === 'returned') ||
-    //             (selectedStatus === 'late' && chiTiet.tinhTrang === 'late');
-
-    //         return (fullName.includes(searchTerm.toLowerCase()) ||
-    //                 loanSlipId.includes(searchTerm) ||
-    //                 bookTitle.includes(searchTerm)) && 
-    //                 isStatusMatch;
-    //     });
-    // };
 
     const filterChiTietPhieuMuons = () => {
         return chiTietPhieuMuons.filter(chiTiet => {
@@ -136,38 +120,37 @@ const MuonTra = () => {
             const loanSlipId = chiTiet.phieuMuon_id?.toString() || '';
             const bookTitle = chiTiet.sach?.tenSach?.toLowerCase() || '';
 
-            // Match tinhTrang based on selectedStatus (borrowed, returned, late, or all)
             const isStatusMatch = selectedStatus === 'all' ||
                 (selectedStatus === 'borrowed' && chiTiet.tinhTrang === 'borrowed') ||
                 (selectedStatus === 'returned' && chiTiet.tinhTrang === 'returned') ||
+                (selectedStatus === 'paid' && chiTiet.tinhTrang === 'paid') ||
                 (selectedStatus === 'late' && chiTiet.tinhTrang === 'late');
 
-            // Get month and year from the ngayMuon or ngayTraThucTe field
-            const ngayMuon = new Date(chiTiet.phieuMuon?.ngayMuon);
+            const daTraTienPhat = chiTiet.daTraTienPhat;
+            const ngayMuon = new Date(chiTiet.ngayMuon);
             const ngayTraThucTe = chiTiet.ngayTraThucTe ? new Date(chiTiet.ngayTraThucTe) : null;
 
-            // Match month and year if provided (from ngayMuon or ngayTraThucTe based on tinhTrang)
             const isDateMatch = (() => {
-                const selectedMonth = parseInt(filterMonth, 10);  // Assume filterMonth is a string like "7" for July
-                const selectedYear = parseInt(filterYear, 10);    // Assume filterYear is a string like "2024"
+                const selectedMonth = parseInt(filterMonth, 10);  
+                const selectedYear = parseInt(filterYear, 10);    
 
-                // If no month/year is selected, it's a match (i.e., don't filter by date)
                 if (!filterMonth || !filterYear) return true;
 
-                // If status is borrowed, match based on ngayMuon
-                if (chiTiet.tinhTrang === 'borrowed' && ngayMuon) {
+                if (chiTiet.tinhTrang === 'borrowed' && chiTiet.ngayMuon) {
                     return ngayMuon.getMonth() + 1 === selectedMonth && ngayMuon.getFullYear() === selectedYear;
                 }
 
-                // If status is returned or late, match based on ngayTraThucTe
                 if (['returned', 'late'].includes(chiTiet.tinhTrang) && ngayTraThucTe) {
                     return ngayTraThucTe.getMonth() + 1 === selectedMonth && ngayTraThucTe.getFullYear() === selectedYear;
                 }
 
-                return false;  // Default if no conditions match
+                if (chiTiet.tinhTrang === 'paid' && daTraTienPhat === true) {
+                    return ngayTraThucTe.getMonth() + 1 === selectedMonth && ngayTraThucTe.getFullYear() === selectedYear;
+                }
+
+                return false;  
             })();
 
-            // Final filter condition (combines search term, status, and date filter)
             return (
                 (fullName.includes(searchTerm.toLowerCase()) ||
                     loanSlipId.includes(searchTerm) ||
@@ -183,8 +166,8 @@ const MuonTra = () => {
         setSelectedUserId('');
         setSelectedBookTitle('');
         setSelectedLoanSlipId('');
-        setSearchTerm(''); // Đặt lại trường tìm kiếm
-        setSelectedStatus('all'); // Đặt lại tình trạng về "Tất cả"
+        setSearchTerm(''); 
+        setSelectedStatus('all'); 
     };
 
     const handleErrors = (error) => {
@@ -206,7 +189,6 @@ const MuonTra = () => {
 
             <div className="status-filter">
                 <div className="d-flex flex-wrap align-items-center">
-                    {/* Radio buttons for status filter */}
                     <Form.Check
                         type="radio"
                         label="Tất cả"
@@ -240,6 +222,16 @@ const MuonTra = () => {
                         name="status"
                         value="late"
                         checked={selectedStatus === 'late'}
+                        onChange={(e) => setSelectedStatus(e.target.value)}
+                        className="me-4"
+                    />
+
+                    <Form.Check
+                        type="radio"
+                        label="Đã trả phạt"
+                        name="status"
+                        value="paid"
+                        checked={selectedStatus === 'paid'}
                         onChange={(e) => setSelectedStatus(e.target.value)}
                         className="me-4"
                     />
@@ -287,11 +279,10 @@ const MuonTra = () => {
                             required
                         >
                             <option value="">Năm</option>
-                            <option value="2024">2020</option>
-                            <option value="2024">2021</option>
-                            <option value="2024">2022</option>
-                            <option value="2023">2023</option>
                             <option value="2024">2024</option>
+                            <option value="2024">2023</option>
+                            <option value="2024">2022</option>
+                            <option value="2024">2021</option>
 
                         </Form.Control>
                     </Form.Group>
@@ -309,7 +300,7 @@ const MuonTra = () => {
             </Form.Group>
 
 
-            <div className="form1-container">
+            {/* <div className="form1-container">
                 <Form.Group controlId="borrowDropdown">
                     <Button variant="primary" onClick={toggleDropdown}>
                         {isDropdownOpen ? <ArrowDropDownIcon /> : 'Cập nhật thông tin mượn sách'}
@@ -378,7 +369,7 @@ const MuonTra = () => {
                         </Form>
                     </>
                 )}
-            </div>
+            </div> */}
 
 
             <Table bordered hover responsive className="table-chi-tiet">
@@ -391,7 +382,8 @@ const MuonTra = () => {
                         <th>Tình Trạng</th>
                         <th>Ngày Mượn</th>
                         <th>Ngày Trả Thực Tế</th>
-                        <th>Tiền Phạt</th>
+                        <th>Phạt</th>
+                        <th>Đã trả phạt</th>
                         <th>Tác Vụ</th>
                     </tr>
                 </thead>
@@ -407,14 +399,23 @@ const MuonTra = () => {
                                     {chiTiet.tinhTrang === 'returned' ? (
                                         <CheckIcon style={{ color: 'green' }} />
                                     ) : chiTiet.tinhTrang === 'late' ? (
-                                        <span style={{ color: 'red' }}>Quá hạn trả</span>
-                                    ) : (
+                                        <span style={{ color: 'red' }}>Quá hạn</span>
+                                    ) :  chiTiet.tinhTrang === 'borrowed' ? (
                                         <span style={{ color: 'dodgerblue' }}>Đang mượn</span>
+                                    ) : (
+                                        <span style={{ color: '#473C8B' }}>Đã trả phạt</span>
                                     )}
                                 </td>
                                 <td>{chiTiet.ngayMuon}</td>
-                                <td>{chiTiet.ngayTraThucTe || 'Chưa trả'}</td>
+                                <td>{chiTiet.ngayTraThucTe || '___'}</td>
                                 <td>{chiTiet.tienPhat ? `${chiTiet.tienPhat} VNĐ` : '___'}</td>
+                                <td>
+                                    {chiTiet.daTraTienPhat ? (
+                                        <CheckIcon style={{ color: 'green' }} />  
+                                    ) : (
+                                        <span>___</span>
+                                    )}
+                                    </td>
                                 <td className="action-buttons-mt">
                                     <Button variant="primary" onClick={() => fetchBorrowedBooks(chiTiet.docGia_id)}>
                                         <InfoIcon />
@@ -464,6 +465,7 @@ const MuonTra = () => {
                                     <option value="borrowed">Đang mượn</option>
                                     <option value="returned">Đã trả</option>
                                     <option value="late">Quá hạn</option>
+                                    <option value="paid">Đã trả phạt</option>
                                 </Form.Control>
                             </Form.Group>
 
@@ -497,6 +499,7 @@ const MuonTra = () => {
                                     <th>Ngày Mượn</th>
                                     <th>Ngày Trả Thực Tế</th>
                                     <th>Tiền Phạt</th>
+                                    <th>Đã trả phạt</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -509,14 +512,23 @@ const MuonTra = () => {
                                                 {book.tinhTrang === 'returned' ? (
                                                     <CheckIcon style={{ color: 'green' }} />
                                                 ) : book.tinhTrang === 'late' ? (
-                                                    <span style={{ color: 'red' }}>Quá hạn trả</span>
-                                                ) : (
+                                                    <span style={{ color: 'red' }}>Quá hạn</span>
+                                                ) :  book.tinhTrang === 'borrowed' ? (
                                                     <span style={{ color: 'dodgerblue' }}>Đang mượn</span>
+                                                ) : (
+                                                    <span style={{ color: '#473C8B' }}>Đã trả phạt</span>
                                                 )}
                                             </td>
                                             <td>{new Date(book.ngayMuon).toLocaleDateString()}</td>
-                                            <td>{book.ngayTraThucTe ? new Date(book.ngayTraThucTe).toLocaleDateString() : 'Chưa trả'}</td>
+                                            <td>{book.ngayTraThucTe ? new Date(book.ngayTraThucTe).toLocaleDateString() : '___'}</td>
                                             <td>{book.tienPhat}</td>
+                                            <td>
+                                                {book.daTraTienPhat ? (
+                                                    <CheckIcon style={{ color: 'green' }} />  
+                                                ) : (
+                                                    <span>___</span>
+                                                )}
+                                            </td>
                                         </tr>
                                     ))
                                 ) : (
