@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://192.168.1.9:8000';
+const BASE_URL = 'http://192.168.1.8:8000';
 
 export const endpoints = {
   nguoidung: '/api/nguoidung/',
@@ -57,9 +57,7 @@ export const endpoints = {
   thongKeTheoDoTuoi: '/api/nguoidung/thong-ke-do-tuoi/',
   binhluan: (bookId) => `api/binhluan/?sach_id=${bookId}`,
   create_comment: (bookId) => `/api/binhluan/${bookId}/create-comment/`,
-
   share: (id) => `/api/chiase/${id}/share/`,
-
   zalo: 'api/payment/zalopay/order/',
 
 };
